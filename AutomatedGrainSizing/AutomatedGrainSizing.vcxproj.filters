@@ -36,6 +36,9 @@
     <ClCompile Include="AutomaticGrainSizing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="showwidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="AutomaticGrainSizing.qrc">
@@ -44,6 +47,9 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="AutomaticGrainSizing.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="showwidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
