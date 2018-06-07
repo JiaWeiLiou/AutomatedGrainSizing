@@ -39,12 +39,18 @@
     <ClCompile Include="showmainwindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="showimage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="showwidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="showmainwindow.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="showimage.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

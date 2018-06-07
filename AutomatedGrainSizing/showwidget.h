@@ -2,15 +2,27 @@
 
 #include <QtWidgets/QWidget>
 #include <QLabel>
-#include <QTextEdit>
-#include <QImage>
+#include <QCheckBox>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QRegExp>
+#include <QRegExpValidator>
+#include <QToolTip>
+#include "showimage.h"
 
 class ShowWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit ShowWidget(QWidget *parent = Q_NULLPTR);
-	QImage img;
-	QLabel *imageLabel;
-	QTextEdit *text;
+	ShowWidget(QWidget *parent = Q_NULLPTR);
+private:
+	ShowImage *imageWidget;
+	QCheckBox *pptCheckBox;
+	QLabel *heightLabel;
+	QLineEdit *heightLineEdit;
+	QLabel *huintLabel;
+	QLabel *widthLabel;
+	QLineEdit *widthLineEdit;
+	QLabel *wuintLabel;
+	QPushButton *startPushButton;
 };

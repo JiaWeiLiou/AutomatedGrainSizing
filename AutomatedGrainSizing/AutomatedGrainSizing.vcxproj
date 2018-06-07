@@ -112,6 +112,7 @@
     </QtRcc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="showimage.cpp" />
     <ClCompile Include="showmainwindow.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="showwidget.cpp" />
@@ -124,6 +125,9 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="showwidget.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="showimage.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

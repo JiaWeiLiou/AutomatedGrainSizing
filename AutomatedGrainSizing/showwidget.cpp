@@ -1,13 +1,47 @@
 #include "showwidget.h"
 #include <QHBoxLayout>
+#include <QVBoxLayout>
+
 
 ShowWidget::ShowWidget(QWidget *parent)
 	: QWidget(parent)
 {
-	imageLabel = new QLabel;
-	imageLabel->setScaledContents(true);
-	text = new QTextEdit;
-	QHBoxLayout *mainLayout = new QHBoxLayout(this);
-	mainLayout->addWidget(imageLabel);
-	mainLayout->addWidget(text);
+	ShowImage *imageWidget = new ShowImage;
+	imageWidget->setFocusPolicy(Qt::ClickFocus);
+	imageWidget->setMinimumSize(600, 400);
+	imageWidget->setStyleSheet("border: 1px solid lightgray;");;
+	pptCheckBox = new QCheckBox("Perspective Projection Transform");
+	QRegExp rx("^[0-9]*[1-9][0-9]*$");
+	QValidator *validator = new QRegExpValidator(rx, this);
+	heightLabel = new QLabel("Height");
+	heightLineEdit = new QLineEdit("1000");
+	heightLineEdit->setValidator(validator);
+	heightLineEdit->setFixedWidth(50);
+	heightLineEdit->setAlignment(Qt::AlignRight);
+	huintLabel = new QLabel("(mm)");
+	widthLabel = new QLabel("Width");
+	widthLineEdit = new QLineEdit("1000");
+	widthLineEdit->setValidator(validator);
+	widthLineEdit->setFixedWidth(50);
+	widthLineEdit->setAlignment(Qt::AlignRight);
+	wuintLabel = new QLabel("(mm)");
+	startPushButton = new QPushButton("Start");
+	startPushButton->setMinimumWidth(100);
+	QHBoxLayout *hLayout = new QHBoxLayout;
+	hLayout->addWidget(pptCheckBox);
+	hLayout->addSpacing(20);
+	hLayout->addStretch(5);
+	hLayout->addWidget(heightLabel);
+	hLayout->addWidget(heightLineEdit);
+	hLayout->addWidget(huintLabel);
+	hLayout->addSpacing(10);
+	hLayout->addWidget(widthLabel);
+	hLayout->addWidget(widthLineEdit);
+	hLayout->addWidget(wuintLabel);
+	hLayout->addSpacing(20);
+	hLayout->addStretch(1);
+	hLayout->addWidget(startPushButton);
+	QVBoxLayout *mainLayout = new QVBoxLayout(this);
+	mainLayout->addWidget(imageWidget);
+	mainLayout->addLayout(hLayout);
 }

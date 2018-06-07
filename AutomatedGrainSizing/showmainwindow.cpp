@@ -3,7 +3,7 @@
 ShowMainWindow::ShowMainWindow(QWidget *parent)
 	: QMainWindow(parent)
 {
-	setWindowTitle("Easy Word");
+	setWindowTitle("Automated Grain Sizing");
 	showWidget = new ShowWidget(this);
 	setCentralWidget(showWidget);
 	createActions();
@@ -15,32 +15,32 @@ void ShowMainWindow::createActions()
 	// Open Image
 	openImageAction = new QAction("&Open Image(O)...", this);
 	openImageAction->setShortcut(tr("Ctrl+O"));
-	openImageAction->setStatusTip("Open Image");
+	openImageAction->setToolTip("Open Image");
 
 	// Load Parameter
 	loadParameterAction = new QAction("&Load Parameter(L)...", this);
 	loadParameterAction->setShortcut(tr("Ctrl+L"));
-	loadParameterAction->setStatusTip("Load Parameter");
+	loadParameterAction->setToolTip("Load Parameter");
 
 	// Close Image
 	closeImageAction = new QAction("&Close Image(C)", this);
 	closeImageAction->setShortcut(tr("Ctrl+C"));
-	closeImageAction->setStatusTip("Close Image");
+	closeImageAction->setToolTip("Close Image");
 
 	// Save Parameter
 	saveParameterAction = new QAction("&Save Parameter(S)", this);
 	saveParameterAction->setShortcut(tr("Ctrl+S"));
-	saveParameterAction->setStatusTip("Save Parameter");
+	saveParameterAction->setToolTip("Save Parameter");
 
 	// Save Parameter As
 	saveParameterAsAction = new QAction("&Save Parameter As(A)...", this);
 	saveParameterAsAction->setShortcut(tr("Ctrl+A"));
-	saveParameterAsAction->setStatusTip("Save Parameter As");
+	saveParameterAsAction->setToolTip("Save Parameter As");
 
 	// Quit
 	quitAction = new QAction("&Quit(Q)", this);
 	quitAction->setShortcut(tr("Ctrl+Q"));
-	quitAction->setStatusTip("Quit");
+	quitAction->setToolTip("Quit");
 }
 
 void ShowMainWindow::createMenus()
