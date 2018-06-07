@@ -33,24 +33,24 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AutomaticGrainSizing.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="showwidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="showmainwindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <QtRcc Include="AutomaticGrainSizing.qrc">
-      <Filter>Resource Files</Filter>
-    </QtRcc>
-  </ItemGroup>
-  <ItemGroup>
-    <QtMoc Include="AutomaticGrainSizing.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="showwidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="showmainwindow.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="AutomatedGrainSizing.qrc">
+      <Filter>Resource Files</Filter>
+    </QtRcc>
   </ItemGroup>
 </Project>

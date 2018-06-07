@@ -1,6 +1,6 @@
-#include "AutomaticGrainSizing.h"
+#include "showmainwindow.h"
 
-AutomaticGrainSizing::AutomaticGrainSizing(QWidget *parent)
+ShowMainWindow::ShowMainWindow(QWidget *parent)
 	: QMainWindow(parent)
 {
 	setWindowTitle("Easy Word");
@@ -10,7 +10,7 @@ AutomaticGrainSizing::AutomaticGrainSizing(QWidget *parent)
 	createMenus();
 }
 
-void AutomaticGrainSizing::createActions()
+void ShowMainWindow::createActions()
 {
 	// Open Image
 	openImageAction = new QAction("&Open Image(O)...", this);
@@ -43,7 +43,7 @@ void AutomaticGrainSizing::createActions()
 	quitAction->setStatusTip("Quit");
 }
 
-void AutomaticGrainSizing::createMenus()
+void ShowMainWindow::createMenus()
 {
 	// File Menu
 	fileMenu = menuBar()->addMenu("&File(F)");

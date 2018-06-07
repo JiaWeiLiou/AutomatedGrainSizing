@@ -6,12 +6,12 @@
 #include <QAction>
 #include "showwidget.h"
 
-class AutomaticGrainSizing : public QMainWindow
+class ShowMainWindow : public QMainWindow
 {
 	Q_OBJECT
 
 public:
-	AutomaticGrainSizing(QWidget *parent = Q_NULLPTR);
+	ShowMainWindow(QWidget *parent = Q_NULLPTR);
 	void createActions();
 	void createMenus();
 private:

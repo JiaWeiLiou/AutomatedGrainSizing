@@ -112,15 +112,15 @@
     </QtRcc>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AutomaticGrainSizing.cpp" />
+    <ClCompile Include="showmainwindow.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="showwidget.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <QtRcc Include="AutomaticGrainSizing.qrc" />
+    <QtRcc Include="AutomatedGrainSizing.qrc" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="AutomaticGrainSizing.h" />
+    <QtMoc Include="showmainwindow.h" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="showwidget.h" />
