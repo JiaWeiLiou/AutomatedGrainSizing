@@ -19,6 +19,7 @@
 #include <QString>
 #include <QFile>
 #include <QTextStream>
+#include <QtMath>
 
 
 #define imgW (img.size().width())	// image width
@@ -62,4 +63,5 @@ private:
 	QPointF pos1;			// mouse press position 1
 	QPointF pos2;			// mouse press position 2
 	bool outBorder;			// record point is out of border or not
+	bool modified;			// record point is modified or not
 };
