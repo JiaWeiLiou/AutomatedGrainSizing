@@ -64,4 +64,5 @@ private:
 	QPointF pos2;			// mouse press position 2
 	bool outBorder;			// record point is out of border or not
 	bool modified;			// record point is modified or not
+	char modifyState;		// record modify state of points
 };
