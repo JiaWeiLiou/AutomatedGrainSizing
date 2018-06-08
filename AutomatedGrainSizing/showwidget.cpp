@@ -14,18 +14,18 @@ ShowWidget::ShowWidget(QWidget *parent)
 	pptCheckBox->setEnabled(false);
 	QRegExp rx("^[0-9]*[1-9][0-9]*$");
 	QValidator *validator = new QRegExpValidator(rx, this);
-	heightLabel = new QLabel("Height");
-	heightLineEdit = new QLineEdit("1000");
-	heightLineEdit->setValidator(validator);
-	heightLineEdit->setFixedWidth(50);
-	heightLineEdit->setAlignment(Qt::AlignRight);
-	huintLabel = new QLabel("(mm)");
 	widthLabel = new QLabel("Width");
 	widthLineEdit = new QLineEdit("1000");
 	widthLineEdit->setValidator(validator);
 	widthLineEdit->setFixedWidth(50);
 	widthLineEdit->setAlignment(Qt::AlignRight);
 	wuintLabel = new QLabel("(mm)");
+	heightLabel = new QLabel("Height");
+	heightLineEdit = new QLineEdit("1000");
+	heightLineEdit->setValidator(validator);
+	heightLineEdit->setFixedWidth(50);
+	heightLineEdit->setAlignment(Qt::AlignRight);
+	huintLabel = new QLabel("(mm)");
 	startPushButton = new QPushButton("Start");
 	startPushButton->setMinimumWidth(100);
 	startPushButton->setEnabled(false);
@@ -50,19 +50,23 @@ ShowWidget::ShowWidget(QWidget *parent)
 	connect(imageWidget, SIGNAL(pointsChange(size_t)), this, SLOT(setWidgetEnable(size_t)));
 	connect(heightLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setWidgetEnable()));
 	connect(widthLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setWidgetEnable()));
+	connect(this, SIGNAL(emitRealSize(QPointF)), imageWidget, SLOT(getRealSize(QPointF)));
+	connect(pptCheckBox, SIGNAL(stateChanged(int)), imageWidget, SLOT(getState(int)));
 }
 
 void ShowWidget::setWidgetEnable(size_t num)
 {
-	int Hvalue = heightLineEdit->text().toInt();
+	pointNum = num;
 	int Wvalue = widthLineEdit->text().toInt();
-	if (num >= 4 && Hvalue > 0 && Wvalue > 0) {
+	int Hvalue = heightLineEdit->text().toInt();
+	if (pointNum >= 4 && Wvalue > 0 && Hvalue > 0) {
 		pptCheckBox->setEnabled(true);
+		emit emitRealSize(QPointF(Wvalue, Hvalue));
 	} else {
 		pptCheckBox->setEnabled(false);
 	}
 
-	if (num == 6 && Hvalue > 0 && Wvalue > 0) {
+	if (pointNum == 6 && Wvalue > 0 && Hvalue > 0) {
 		startPushButton->setEnabled(true);
 	} else {
 		startPushButton->setEnabled(false);
@@ -73,11 +77,14 @@ void ShowWidget::setWidgetEnable()
 {
 	int Hvalue = heightLineEdit->text().toInt();
 	int Wvalue = widthLineEdit->text().toInt();
-	if (Hvalue > 0 && Wvalue > 0) {
+	if (pointNum >= 4 && Hvalue > 0 && Wvalue > 0) {
 		pptCheckBox->setEnabled(true);
-		startPushButton->setEnabled(true);
 	} else {
 		pptCheckBox->setEnabled(false);
+	}
+	if (pointNum == 6 && Hvalue > 0 && Wvalue > 0) {
+		startPushButton->setEnabled(true);
+	} else {
 		startPushButton->setEnabled(false);
 	}
 }

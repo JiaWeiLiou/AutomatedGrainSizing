@@ -9,6 +9,7 @@
 #include <QRegExpValidator>
 #include <QToolTip>
 #include <QString>
+#include <QPointF>
 #include "showimage.h"
 
 class ShowWidget : public QWidget
@@ -20,15 +21,19 @@ public:
 
 private:
 	QCheckBox *pptCheckBox;
-	QLabel *heightLabel;
-	QLineEdit *heightLineEdit;
-	QLabel *huintLabel;
 	QLabel *widthLabel;
 	QLineEdit *widthLineEdit;
 	QLabel *wuintLabel;
+	QLabel *heightLabel;
+	QLineEdit *heightLineEdit;
+	QLabel *huintLabel;
 	QPushButton *startPushButton;
+	size_t pointNum;
 
 private slots:
 	void setWidgetEnable(size_t);
 	void setWidgetEnable();
+
+signals:
+	void emitRealSize(QPointF);
 };

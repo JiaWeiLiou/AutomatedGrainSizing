@@ -22,10 +22,12 @@
 #include <QtMath>
 #include <QStyleOption>
 #include <QStyle>
+#include <QTransform>
+#include <cmath>
+#include <opencv2/opencv.hpp>
 
-
-#define imgW (img.size().width())	// image width
-#define imgH (img.size().height())	// image height
+#define imgW (imgS.size().width())	// image width
+#define imgH (imgS.size().height())	// image height
 #define winW (width())				// window width
 #define winH (height())				// window height
 
@@ -38,12 +40,12 @@ public:
 	QVector<QPointF> image4Points;				// record 4 image points' pixel
 	QVector<QPointF> image2Points;				// record 2 image points' pixel
 	bool loading = false;						// loading file
-	QImage img;									// store image
+	QImage imgS;								// image to show
+	QImage imgB;								// store raw image
+	QImage imgA;								// store transform image
 	void initial();								// initial and rest widget
 
 protected:
-	//void dragEnterEvent(QDragEnterEvent *event);// drag event
-	//void dropEvent(QDropEvent *event);			// drop event
 	void resizeEvent(QResizeEvent *event);		// window resize
 	void wheelEvent(QWheelEvent *event);		// wheel zoom in and out
 	void mousePressEvent(QMouseEvent *event);	// mouse press		(overload from QWidget)
@@ -54,6 +56,10 @@ protected:
 
 signals:
 	void pointsChange(size_t);					// points change
+
+private slots:
+	void getRealSize(QPointF);	// get lineEdit size
+	void getState(int);			// get checkbox state
 
 private:
 	float maxScale = 0.0f;	// maximum scale
@@ -66,4 +72,9 @@ private:
 	bool outBorder;			// record point is out of border or not
 	bool modified;			// record point is modified or not
 	char modifyState;		// record modify state of points
+	QPointF realSize;		// record lineEdit size
+	int state;				// record checkBox state
+	void doPPT();			// do perspective projection transform
+	QImage ShowImage::Mat2QImage(const cv::Mat& mat);	// Mat to QImage
+	cv::Mat ShowImage::QImage2Mat(QImage image);		// QImage to Mat
 };

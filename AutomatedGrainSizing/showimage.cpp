@@ -35,7 +35,7 @@ void ShowImage::initial()
 
 void ShowImage::resizeEvent(QResizeEvent *event)
 {
-	if (scale > minScale && !img.isNull()) {
+	if (scale > minScale && !imgS.isNull()) {
 		setCursor(Qt::OpenHandCursor);	// set cursor to open hand type
 	} else {
 		setCursor(Qt::ArrowCursor);	// set cursor to arrow type
@@ -60,7 +60,7 @@ void ShowImage::resizeEvent(QResizeEvent *event)
 
 void ShowImage::wheelEvent(QWheelEvent *event)
 {
-	if (scale > minScale && !img.isNull()) {
+	if (scale > minScale && !imgS.isNull()) {
 		setCursor(Qt::OpenHandCursor);	// set cursor to open hand type
 	} else {
 		setCursor(Qt::ArrowCursor);	// set cursor to arrow type
@@ -84,7 +84,7 @@ void ShowImage::wheelEvent(QWheelEvent *event)
 void ShowImage::mousePressEvent(QMouseEvent *event)
 {
 	// drag image
-	if (event->buttons() == Qt::LeftButton && !img.isNull()) {
+	if (event->buttons() == Qt::LeftButton && !imgS.isNull()) {
 		if (scale > minScale) {
 			setCursor(Qt::ClosedHandCursor);	// set cursor to closed hand type
 		} else {
@@ -93,7 +93,7 @@ void ShowImage::mousePressEvent(QMouseEvent *event)
 		pos1 = QPointF(event->pos());
 		update();
 		// set point
-	} else if (event->buttons() == Qt::RightButton && !img.isNull()) {
+	} else if (event->buttons() == Qt::RightButton && !imgS.isNull()) {
 
 		// set point's location can be mod
 		modifyState = 0;
@@ -185,7 +185,7 @@ void ShowImage::mousePressEvent(QMouseEvent *event)
 void ShowImage::mouseMoveEvent(QMouseEvent *event)
 {
 	// drag image
-	if (event->buttons() == Qt::LeftButton && !img.isNull()) {
+	if (event->buttons() == Qt::LeftButton && !imgS.isNull()) {
 		if (scale > minScale) {
 			setCursor(Qt::ClosedHandCursor);	// set cursor to closed hand type
 		} else {
@@ -196,7 +196,7 @@ void ShowImage::mouseMoveEvent(QMouseEvent *event)
 		newDelta = pos2 - pos1 + oldDelta;
 		update();
 		// set point
-	} else if (event->buttons() == Qt::RightButton && !img.isNull()) {
+	} else if (event->buttons() == Qt::RightButton && !imgS.isNull()) {
 		// set point's location can be mod
 		// mod 4 points
 		if (modified && modifyState <= 4) {
@@ -281,7 +281,7 @@ void ShowImage::mouseMoveEvent(QMouseEvent *event)
 
 void ShowImage::mouseReleaseEvent(QMouseEvent *event)
 {
-	if (scale > minScale && !img.isNull()) {
+	if (scale > minScale && !imgS.isNull()) {
 		setCursor(Qt::OpenHandCursor);	// set cursor to open hand type
 	} else {
 		setCursor(Qt::ArrowCursor);	// set cursor to arrow type
@@ -307,7 +307,6 @@ void ShowImage::mouseReleaseEvent(QMouseEvent *event)
 			sum -= 1;
 		}
 		emit pointsChange(sum);
-
 	}
 	update();
 }
@@ -375,11 +374,11 @@ void ShowImage::paintEvent(QPaintEvent *event)
 	QPainter painter(this);
 	if (loading) {
 		painter.drawText(QRect(winW / 2 - 100 / 2, winH / 2 - 20 / 2, 100, 20), Qt::AlignCenter, "Loading Image...");	// draw loading text
-	} else if (img.isNull()) {
+	} else if (imgS.isNull()) {
 		painter.drawText(QRect(winW / 2 - 50 / 2, winH / 2 - 20 / 2, 50, 20), Qt::AlignCenter, "No Image.");	// draw text
 	} else {
 		QRectF rect(newDelta.x() - 0.5 * scale, newDelta.y() - 0.5 * scale, imgW * scale, imgH * scale);	// draw range
-		painter.drawImage(rect, img);	// draw image
+		painter.drawImage(rect, imgS);	// draw image
 	}
 	
 	/* draw 4 line first */
@@ -420,4 +419,122 @@ void ShowImage::paintEvent(QPaintEvent *event)
 	opt.init(this);
 	QPainter p(this);
 	style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
+}
+
+void ShowImage::doPPT()
+{
+	QVector<QPointF> L ;
+	L << QPointF(0, 0) << QPointF(imgW, 0) << QPointF(imgW, imgH) << QPointF(0, imgH);
+
+	cv::Point2f bPt[4];
+	for (size_t i = 0; i < 4; ++i) {
+		float min = qPow(imgW, 2) + qPow(imgH, 2);
+		int minindex = 0;
+		for (size_t j = 0; j < 4; ++j) {
+			float imin = qPow(image4Points[j].x() - L[i].x(), 2) + qPow(image4Points[j].y() - L[i].y(), 2);
+			if (imin < min) {
+				min = imin;
+				minindex = j;
+			}
+		}
+		bPt[i] = cv::Point2f(image4Points[minindex].x(), image4Points[minindex].y());
+	}
+
+	float A1 = std::sqrt(std::pow(bPt[0].x - bPt[1].x, 2) + std::pow(bPt[0].y - bPt[1].y, 2));
+	float B1 = std::sqrt(std::pow(bPt[1].x - bPt[2].x, 2) + std::pow(bPt[1].y - bPt[2].y, 2));
+	float A2 = std::sqrt(std::pow(bPt[2].x - bPt[3].x, 2) + std::pow(bPt[2].y - bPt[3].y, 2));
+	float B2 = std::sqrt(std::pow(bPt[3].x - bPt[0].x, 2) + std::pow(bPt[3].y - bPt[0].y, 2));
+	float A = A1 > A2 ? A1 : A2;
+	float B = B1 > B2 ? B1 : B2;
+	float Ar = B * float(realSize.x()) / float(realSize.y());
+	float Br = A * float(realSize.y()) / float(realSize.x());
+	
+	float W, H;
+	if (Br >= B) {
+		W = A;
+		H = Br;
+	} else {
+		W = Ar;
+		H = B;
+	}
+	cv::Point2f aPt[4] = { cv::Point2f(0, 0), cv::Point2f(W, 0), cv::Point2f(W, H), cv::Point2f(0, H) };
+	cv::Mat rawImg = ShowImage::QImage2Mat(imgB);
+	cv::Mat perspectiveMatrix = cv::getPerspectiveTransform(bPt, aPt);
+	cv::Mat warpImg;
+	cv::warpPerspective(rawImg, warpImg, perspectiveMatrix, cv::Size(W, H), cv::INTER_CUBIC);
+	imgA = ShowImage::Mat2QImage(warpImg);
+}
+
+void ShowImage::getState(int state)
+{
+	if (state == Qt::Unchecked) {
+		imgS = imgB;
+		initial();
+	} else {
+		doPPT();
+		imgS = imgA;
+		initial();
+	}
+}
+
+void ShowImage::getRealSize(QPointF size)
+{
+	realSize = size;
+}
+
+QImage ShowImage::Mat2QImage(const cv::Mat& mat)
+{
+	// 8-bits unsigned, NO. OF CHANNELS = 1  
+	if (mat.type() == CV_8UC1) {
+		QImage image(mat.cols, mat.rows, QImage::Format_Indexed8);
+		// Set the color table (used to translate colour indexes to qRgb values)  
+		image.setColorCount(256);
+		for (size_t i = 0; i < 256; ++i) {
+			image.setColor(i, qRgb(i, i, i));
+		}
+		// Copy input Mat  
+		uchar *pSrc = mat.data;
+		for (size_t row = 0; row < mat.rows; ++row)	{
+			uchar *pDest = image.scanLine(row);
+			memcpy(pDest, pSrc, mat.cols);
+			pSrc += mat.step;
+		}
+		return image;
+	// 8-bits unsigned, NO. OF CHANNELS = 3  
+	} else if (mat.type() == CV_8UC3) {
+		// Copy input Mat  
+		const uchar *pSrc = (const uchar*)mat.data;
+		// Create QImage with same dimensions as input Mat  
+		QImage image(pSrc, mat.cols, mat.rows, mat.step, QImage::Format_RGB888);
+		return image.rgbSwapped();
+	} else if (mat.type() == CV_8UC4) {
+		// Copy input Mat  
+		const uchar *pSrc = (const uchar*)mat.data;
+		// Create QImage with same dimensions as input Mat  
+		QImage image(pSrc, mat.cols, mat.rows, mat.step, QImage::Format_ARGB32);
+		return image.copy();
+	} else {
+		return QImage();
+	}
+}
+
+cv::Mat ShowImage::QImage2Mat(QImage image)
+{
+	cv::Mat mat;
+	switch (image.format())
+	{
+	case QImage::Format_ARGB32:
+	case QImage::Format_RGB32:
+	case QImage::Format_ARGB32_Premultiplied:
+		mat = cv::Mat(image.height(), image.width(), CV_8UC4, (void*)image.constBits(), image.bytesPerLine());
+		break;
+	case QImage::Format_RGB888:
+		mat = cv::Mat(image.height(), image.width(), CV_8UC3, (void*)image.constBits(), image.bytesPerLine());
+		cv::cvtColor(mat, mat, CV_BGR2RGB);
+		break;
+	case QImage::Format_Indexed8:
+		mat = cv::Mat(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
+		break;
+	}
+	return mat;
 }
