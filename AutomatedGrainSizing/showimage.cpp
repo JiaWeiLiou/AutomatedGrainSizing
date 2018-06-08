@@ -29,6 +29,7 @@ void ShowImage::initial()
 	image4Points.clear();
 	image2Points.clear();
 
+	emit pointsChange(0);
 	repaint();
 }
 

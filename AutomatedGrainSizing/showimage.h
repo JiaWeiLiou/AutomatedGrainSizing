@@ -53,7 +53,7 @@ protected:
 	void paintEvent(QPaintEvent *event);		// drawing the result
 
 signals:
-	void pointsChange(size_t);
+	void pointsChange(size_t);					// points change
 
 private:
 	float maxScale = 0.0f;	// maximum scale

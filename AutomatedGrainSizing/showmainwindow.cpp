@@ -39,7 +39,7 @@ void ShowMainWindow::dropEvent(QDropEvent *event)
 	setWindowTitle(fileName + QString(" - Automated Grain Sizing"));
 
 	showWidget->imageWidget->loading = true;			// show loading
-	showWidget->imageWidget->repaint();					// force to reset window
+	showWidget->imageWidget->initial();					// initial image widget
 	showWidget->imageWidget->img.load(filePathName);	// store image's
 	showWidget->imageWidget->loading = false;			// show loading
 	showWidget->imageWidget->initial();					// initial image widget
