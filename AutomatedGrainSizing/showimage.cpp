@@ -59,7 +59,7 @@ void ShowImage::dropEvent(QDropEvent *event)
 
 void ShowImage::resizeEvent(QResizeEvent *event)
 {
-	if (scale > minScale) {
+	if (scale > minScale && !img.isNull()) {
 		setCursor(Qt::OpenHandCursor);	// set cursor to open hand type
 	} else {
 		setCursor(Qt::ArrowCursor);	// set cursor to arrow type
@@ -84,7 +84,7 @@ void ShowImage::resizeEvent(QResizeEvent *event)
 
 void ShowImage::wheelEvent(QWheelEvent *event)
 {
-	if (scale > minScale) {
+	if (scale > minScale && !img.isNull()) {
 		setCursor(Qt::OpenHandCursor);	// set cursor to open hand type
 	} else {
 		setCursor(Qt::ArrowCursor);	// set cursor to arrow type
@@ -108,7 +108,7 @@ void ShowImage::wheelEvent(QWheelEvent *event)
 void ShowImage::mousePressEvent(QMouseEvent *event)
 {
 	// drag image
-	if (event->buttons() == Qt::LeftButton) {
+	if (event->buttons() == Qt::LeftButton && !img.isNull()) {
 		if (scale > minScale) {
 			setCursor(Qt::ClosedHandCursor);	// set cursor to closed hand type
 		} else {
@@ -117,7 +117,7 @@ void ShowImage::mousePressEvent(QMouseEvent *event)
 		pos1 = QPointF(event->pos());
 		update();
 		// set point
-	} else if (event->buttons() == Qt::RightButton) {
+	} else if (event->buttons() == Qt::RightButton && !img.isNull()) {
 
 		// set point's location can be mod
 		modifyState = 0;
@@ -209,7 +209,7 @@ void ShowImage::mousePressEvent(QMouseEvent *event)
 void ShowImage::mouseMoveEvent(QMouseEvent *event)
 {
 	// drag image
-	if (event->buttons() == Qt::LeftButton) {
+	if (event->buttons() == Qt::LeftButton && !img.isNull()) {
 		if (scale > minScale) {
 			setCursor(Qt::ClosedHandCursor);	// set cursor to closed hand type
 		} else {
@@ -220,7 +220,7 @@ void ShowImage::mouseMoveEvent(QMouseEvent *event)
 		newDelta = pos2 - pos1 + oldDelta;
 		update();
 		// set point
-	} else if (event->buttons() == Qt::RightButton) {
+	} else if (event->buttons() == Qt::RightButton && !img.isNull()) {
 		// set point's location can be mod
 		// mod 4 points
 		if (modified && modifyState <= 4) {
@@ -305,7 +305,7 @@ void ShowImage::mouseMoveEvent(QMouseEvent *event)
 
 void ShowImage::mouseReleaseEvent(QMouseEvent *event)
 {
-	if (scale > minScale) {
+	if (scale > minScale && !img.isNull()) {
 		setCursor(Qt::OpenHandCursor);	// set cursor to open hand type
 	} else {
 		setCursor(Qt::ArrowCursor);	// set cursor to arrow type
@@ -395,12 +395,15 @@ void ShowImage::paintEvent(QPaintEvent *event)
 		newDelta.ry() = winH - (imgH - 1) * scale;
 	}
 
-	QPainter painter(this);
-
 	/* draw image */
-	QRectF rect(newDelta.x() - 0.5 * scale, newDelta.y() - 0.5 * scale, imgW * scale, imgH * scale);	// draw range
-	painter.drawImage(rect, img);	// draw image
-
+	QPainter painter(this);
+	if (img.isNull()) {
+		painter.drawText(QRect(winW / 2 - 50 / 2, winH / 2 - 20 / 2, 50, 20), Qt::AlignCenter, "No Image.");	// draw text
+	} else {
+		QRectF rect(newDelta.x() - 0.5 * scale, newDelta.y() - 0.5 * scale, imgW * scale, imgH * scale);	// draw range
+		painter.drawImage(rect, img);	// draw image
+	}
+	
 	/* draw 4 line first */
 	if (image4Points.size() > 1) {
 		for (int i = 0; i < image4Points.size() - 1; ++i) {
