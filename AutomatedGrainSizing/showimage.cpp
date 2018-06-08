@@ -207,12 +207,28 @@ void ShowImage::mouseReleaseEvent(QMouseEvent *event)
 		setCursor(Qt::ArrowCursor);	// set cursor to arrow type
 	}
 	
-	oldDelta = newDelta;	// record the distance of drag image
+	// drag image
+	if (event->button() == Qt::LeftButton) {
 
-	if (image4Points.size() == 4) {
-		image4Points.push_back(image4Points[0]);	// put first point back to prevent press and move to add new point
-	} else if (image2Points.size() == 2) {
-		image2Points.push_back(image2Points[0]);	// put first point back to prevent press and move to add new point
+		oldDelta = newDelta;	// record the distance of drag image
+
+	} else if (event->button() == Qt::RightButton) {
+
+		if (image4Points.size() == 4) {
+			image4Points.push_back(image4Points[0]);	// put first point back to prevent press and move to add new point
+		} else if (image2Points.size() == 2) {
+			image2Points.push_back(image2Points[0]);	// put first point back to prevent press and move to add new point
+		}
+
+		size_t sum = image4Points.size() + image2Points.size();
+		if (image4Points.size() == 5) {
+			sum -= 1;
+		}
+		if (image2Points.size() == 3) {
+			sum -= 1;
+		}
+		emit pointsChange(sum);
+
 	}
 	update();
 }
@@ -239,6 +255,15 @@ void ShowImage::keyPressEvent(QKeyEvent *event)
 			update();
 		}
 	}
+
+	size_t sum = image4Points.size() + image2Points.size();
+	if (image4Points.size() == 5) {
+		sum -= 1;
+	}
+	if (image2Points.size() == 3) {
+		sum -= 1;
+	}
+	emit pointsChange(sum);
 }
 
 void ShowImage::paintEvent(QPaintEvent *event)

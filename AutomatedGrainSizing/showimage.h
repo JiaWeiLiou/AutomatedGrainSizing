@@ -34,6 +34,7 @@ public:
 	ShowImage(QWidget *parent = Q_NULLPTR);
 	QVector<QPointF> image4Points;				// record 4 image points' pixel
 	QVector<QPointF> image2Points;				// record 2 image points' pixel
+	QImage img;									// store image
 
 protected:
 	void initial();								// initial and rest widget
@@ -47,8 +48,10 @@ protected:
 	void keyPressEvent(QKeyEvent *event);		// keyboard press	(overload from QWidget)
 	void paintEvent(QPaintEvent *event);		// drawing the result
 
+signals:
+	void pointsChange(size_t);
+
 private:
-	QImage img;				// store image
 	QString fileName;		// store image name
 	QString filePath;		// store image name
 	float maxScale = 0.0f;	// maximum scale

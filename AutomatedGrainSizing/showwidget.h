@@ -25,4 +25,6 @@ private:
 	QLineEdit *widthLineEdit;
 	QLabel *wuintLabel;
 	QPushButton *startPushButton;
+private slots:
+	void setWidgetEnable(size_t);
 };

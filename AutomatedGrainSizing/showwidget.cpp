@@ -11,6 +11,7 @@ ShowWidget::ShowWidget(QWidget *parent)
 	imageWidget->setMinimumSize(600, 400);
 	imageWidget->setStyleSheet("border: 1px solid lightgray;");;
 	pptCheckBox = new QCheckBox("Perspective Projection Transform");
+	pptCheckBox->setEnabled(false);
 	QRegExp rx("^[0-9]*[1-9][0-9]*$");
 	QValidator *validator = new QRegExpValidator(rx, this);
 	heightLabel = new QLabel("Height");
@@ -27,6 +28,7 @@ ShowWidget::ShowWidget(QWidget *parent)
 	wuintLabel = new QLabel("(mm)");
 	startPushButton = new QPushButton("Start");
 	startPushButton->setMinimumWidth(100);
+	startPushButton->setEnabled(false);
 	QHBoxLayout *hLayout = new QHBoxLayout;
 	hLayout->addWidget(pptCheckBox);
 	hLayout->addSpacing(20);
@@ -44,4 +46,21 @@ ShowWidget::ShowWidget(QWidget *parent)
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
 	mainLayout->addWidget(imageWidget);
 	mainLayout->addLayout(hLayout);
+
+	connect(imageWidget, SIGNAL(pointsChange(size_t)), this, SLOT(setWidgetEnable(size_t)));
+}
+
+void ShowWidget::setWidgetEnable(size_t num)
+{
+	if (num >= 4) {
+		pptCheckBox->setEnabled(true);
+	} else {
+		pptCheckBox->setEnabled(false);
+	}
+
+	if (num == 6) {
+		startPushButton->setEnabled(true);
+	} else {
+		startPushButton->setEnabled(false);
+	}
 }
