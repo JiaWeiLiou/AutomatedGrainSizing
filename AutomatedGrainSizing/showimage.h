@@ -20,6 +20,8 @@
 #include <QFile>
 #include <QTextStream>
 #include <QtMath>
+#include <QStyleOption>
+#include <QStyle>
 
 
 #define imgW (img.size().width())	// image width

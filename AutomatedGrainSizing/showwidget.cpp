@@ -9,7 +9,7 @@ ShowWidget::ShowWidget(QWidget *parent)
 	ShowImage *imageWidget = new ShowImage;
 	imageWidget->setFocusPolicy(Qt::ClickFocus);
 	imageWidget->setMinimumSize(600, 400);
-	imageWidget->setStyleSheet("border: 1px solid lightgray;");;
+	imageWidget->setStyleSheet("border: 1px solid lightgray;");
 	pptCheckBox = new QCheckBox("Perspective Projection Transform");
 	pptCheckBox->setEnabled(false);
 	QRegExp rx("^[0-9]*[1-9][0-9]*$");

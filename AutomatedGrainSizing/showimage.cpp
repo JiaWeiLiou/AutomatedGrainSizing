@@ -433,4 +433,10 @@ void ShowImage::paintEvent(QPaintEvent *event)
 			painter.drawPoint(image2Points[i] * scale + newDelta);
 		}
 	}
+
+	/* set for setStyleSheet */
+	QStyleOption opt;
+	opt.init(this);
+	QPainter p(this);
+	style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }
