@@ -8,6 +8,7 @@
 #include <QRegExp>
 #include <QRegExpValidator>
 #include <QToolTip>
+#include <QString>
 #include "showimage.h"
 
 class ShowWidget : public QWidget
@@ -27,4 +28,5 @@ private:
 	QPushButton *startPushButton;
 private slots:
 	void setWidgetEnable(size_t);
+	void setWidgetEnable();
 };

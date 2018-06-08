@@ -48,6 +48,8 @@ ShowWidget::ShowWidget(QWidget *parent)
 	mainLayout->addLayout(hLayout);
 
 	connect(imageWidget, SIGNAL(pointsChange(size_t)), this, SLOT(setWidgetEnable(size_t)));
+	connect(heightLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setWidgetEnable()));
+	connect(widthLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setWidgetEnable()));
 }
 
 void ShowWidget::setWidgetEnable(size_t num)
@@ -61,6 +63,19 @@ void ShowWidget::setWidgetEnable(size_t num)
 	if (num == 6) {
 		startPushButton->setEnabled(true);
 	} else {
+		startPushButton->setEnabled(false);
+	}
+}
+
+void ShowWidget::setWidgetEnable()
+{
+	int Hvalue = heightLineEdit->text().toInt();
+	int Wvalue = widthLineEdit->text().toInt();
+	if (Hvalue > 0 && Wvalue > 0) {
+		pptCheckBox->setEnabled(true);
+		startPushButton->setEnabled(true);
+	} else {
+		pptCheckBox->setEnabled(false);
 		startPushButton->setEnabled(false);
 	}
 }
