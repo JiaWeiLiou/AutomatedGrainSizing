@@ -54,13 +54,15 @@ ShowWidget::ShowWidget(QWidget *parent)
 
 void ShowWidget::setWidgetEnable(size_t num)
 {
-	if (num >= 4) {
+	int Hvalue = heightLineEdit->text().toInt();
+	int Wvalue = widthLineEdit->text().toInt();
+	if (num >= 4 && Hvalue > 0 && Wvalue > 0) {
 		pptCheckBox->setEnabled(true);
 	} else {
 		pptCheckBox->setEnabled(false);
 	}
 
-	if (num == 6) {
+	if (num == 6 && Hvalue > 0 && Wvalue > 0) {
 		startPushButton->setEnabled(true);
 	} else {
 		startPushButton->setEnabled(false);
