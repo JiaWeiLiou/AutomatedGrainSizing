@@ -29,7 +29,7 @@ void ShowImage::initial()
 	image4Points.clear();
 	image2Points.clear();
 
-	update();
+	repaint();
 }
 
 void ShowImage::resizeEvent(QResizeEvent *event)
@@ -54,7 +54,7 @@ void ShowImage::resizeEvent(QResizeEvent *event)
 		minScale = scaleW < scaleH ? scaleW : scaleH;
 		scale = scale < minScale ? minScale : scale;
 	}
-	update();
+	repaint();
 }
 
 void ShowImage::wheelEvent(QWheelEvent *event)
