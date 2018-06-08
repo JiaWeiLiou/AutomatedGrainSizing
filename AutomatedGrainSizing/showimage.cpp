@@ -372,7 +372,9 @@ void ShowImage::paintEvent(QPaintEvent *event)
 
 	/* draw image */
 	QPainter painter(this);
-	if (img.isNull()) {
+	if (loading) {
+		painter.drawText(QRect(winW / 2 - 100 / 2, winH / 2 - 20 / 2, 100, 20), Qt::AlignCenter, "Loading Image...");	// draw loading text
+	} else if (img.isNull()) {
 		painter.drawText(QRect(winW / 2 - 50 / 2, winH / 2 - 20 / 2, 50, 20), Qt::AlignCenter, "No Image.");	// draw text
 	} else {
 		QRectF rect(newDelta.x() - 0.5 * scale, newDelta.y() - 0.5 * scale, imgW * scale, imgH * scale);	// draw range

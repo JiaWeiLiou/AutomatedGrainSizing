@@ -37,6 +37,7 @@ public:
 	ShowImage(QWidget *parent = Q_NULLPTR);
 	QVector<QPointF> image4Points;				// record 4 image points' pixel
 	QVector<QPointF> image2Points;				// record 2 image points' pixel
+	bool loading = false;						// loading file
 	QImage img;									// store image
 	void initial();								// initial and rest widget
 
