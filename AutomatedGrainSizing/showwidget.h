@@ -16,8 +16,9 @@ class ShowWidget : public QWidget
 	Q_OBJECT
 public:
 	ShowWidget(QWidget *parent = Q_NULLPTR);
-private:
 	ShowImage *imageWidget;
+
+private:
 	QCheckBox *pptCheckBox;
 	QLabel *heightLabel;
 	QLineEdit *heightLineEdit;
@@ -26,6 +27,7 @@ private:
 	QLineEdit *widthLineEdit;
 	QLabel *wuintLabel;
 	QPushButton *startPushButton;
+
 private slots:
 	void setWidgetEnable(size_t);
 	void setWidgetEnable();

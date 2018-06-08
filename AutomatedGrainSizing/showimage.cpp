@@ -4,10 +4,7 @@ ShowImage::ShowImage(QWidget *parent)
 	: QWidget(parent)
 {
 	initial();
-
-	/* set widget*/
 	setMouseTracking(true);								// tracking mouse location
-	setAcceptDrops(true);								// set widget can be drop
 }
 
 void ShowImage::initial()
@@ -31,29 +28,7 @@ void ShowImage::initial()
 	/* clear image4Points */
 	image4Points.clear();
 	image2Points.clear();
-}
 
-void ShowImage::dragEnterEvent(QDragEnterEvent *event)
-{
-	if (event->mimeData()->hasFormat("text/uri-list")) {
-		event->acceptProposedAction();
-	}
-}
-
-void ShowImage::dropEvent(QDropEvent *event)
-{
-	QList<QUrl> urls = event->mimeData()->urls();
-	if (urls.isEmpty()) {
-		return;
-	}
-
-	fileName = urls.first().toLocalFile();
-	if (fileName.isEmpty()) {
-		return;
-	}
-
-	img.load(fileName);		// load image
-	initial();				// reset parameter
 	update();
 }
 

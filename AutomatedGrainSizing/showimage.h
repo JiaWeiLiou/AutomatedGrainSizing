@@ -38,11 +38,11 @@ public:
 	QVector<QPointF> image4Points;				// record 4 image points' pixel
 	QVector<QPointF> image2Points;				// record 2 image points' pixel
 	QImage img;									// store image
+	void initial();								// initial and rest widget
 
 protected:
-	void initial();								// initial and rest widget
-	void dragEnterEvent(QDragEnterEvent *event);// drag event
-	void dropEvent(QDropEvent *event);			// drop event
+	//void dragEnterEvent(QDragEnterEvent *event);// drag event
+	//void dropEvent(QDropEvent *event);			// drop event
 	void resizeEvent(QResizeEvent *event);		// window resize
 	void wheelEvent(QWheelEvent *event);		// wheel zoom in and out
 	void mousePressEvent(QMouseEvent *event);	// mouse press		(overload from QWidget)
@@ -55,8 +55,6 @@ signals:
 	void pointsChange(size_t);
 
 private:
-	QString fileName;		// store image name
-	QString filePath;		// store image name
 	float maxScale = 0.0f;	// maximum scale
 	float minScale = 0.0f;	// minimun scale
 	float scale = 0.0f;		// scale to draw

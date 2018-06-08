@@ -6,8 +6,40 @@ ShowMainWindow::ShowMainWindow(QWidget *parent)
 	setWindowTitle("Automated Grain Sizing");
 	showWidget = new ShowWidget(this);
 	setCentralWidget(showWidget);
+	setAcceptDrops(true);								// set main window can be drop
 	createActions();
 	createMenus();
+}
+
+void ShowMainWindow::dragEnterEvent(QDragEnterEvent *event)
+{
+	if (event->mimeData()->hasFormat("text/uri-list")) {
+		event->acceptProposedAction();
+	}
+}
+
+void ShowMainWindow::dropEvent(QDropEvent *event)
+{
+	QList<QUrl> urls = event->mimeData()->urls();
+	if (urls.isEmpty()) {
+		return;
+	}
+
+	filePathName = urls.first().toLocalFile();
+	if (filePathName.isEmpty()) {
+		return;
+	}
+
+	if (!filePathName.isEmpty()) {
+		int pos1 = filePathName.lastIndexOf('/');
+		filePath = filePath.left(pos1 + 1);									//檔案路徑
+		fileName = filePathName.right(filePathName.size() - pos1 - 1);		//檔案名稱
+	}
+
+	setWindowTitle(fileName + QString(" - Automated Grain Sizing"));
+
+	showWidget->imageWidget->img.load(filePathName);	// store image's
+	showWidget->imageWidget->initial();					// reset parameter
 }
 
 void ShowMainWindow::createActions()

@@ -6,7 +6,7 @@
 ShowWidget::ShowWidget(QWidget *parent)
 	: QWidget(parent)
 {
-	ShowImage *imageWidget = new ShowImage;
+	imageWidget = new ShowImage;
 	imageWidget->setFocusPolicy(Qt::ClickFocus);
 	imageWidget->setMinimumSize(600, 400);
 	imageWidget->setStyleSheet("border: 1px solid lightgray;");
