@@ -157,9 +157,63 @@ void RGBToGray(InputArray _image, OutputArray _gray)
 	_gray.create(image.size(), CV_8UC1);
 	Mat gray = _gray.getMat();
 
+	if (image.channels() == 3) {
+		for (size_t i = 0; i < gray.rows; ++i) {
+			for (size_t j = 0; j < gray.cols; ++j) {
+				gray.at<uchar>(i, j) = ((double)image.at<Vec3b>(i, j)[0] + (double)image.at<Vec3b>(i, j)[1] + (double)image.at<Vec3b>(i, j)[2]) / 3;
+			}
+		}
+	} else {
+		image.copyTo(gray);
+	}
+}
+
+void boxBlurM(InputArray _gray, OutputArray _blur, size_t r)
+{
+	Mat gray = _gray.getMat();
+	_blur.create(gray.size(), CV_8UC1);
+	Mat blur = _blur.getMat();
+
+	double iarr = 1.0f / (r + r + 1);
+	Mat blurH(gray.size(), CV_8UC1, Scalar(0));
+
+	//Horizontal
 	for (size_t i = 0; i < gray.rows; ++i) {
+		double val = 0;
+		// first value
+		for (size_t j = 1; j < r + 1; ++j) {
+			val += gray.at<uchar>(i, j);
+		}
+		for (size_t j = 0; j < r - 1; ++j) {
+			val += gray.at<uchar>(i, j);
+		}
+
+		// from 0 to cols
 		for (size_t j = 0; j < gray.cols; ++j) {
-			gray.at<uchar>(i, j) = ((double)image.at<Vec3b>(i, j)[0] + (double)image.at<Vec3b>(i, j)[1] + (double)image.at<Vec3b>(i, j)[2]) / 3;
+			int j1 = gray.cols - 1 - abs((int)(j - gray.cols + 1 + r));
+			int j2 = abs((int)(r - j + 1));
+			val += gray.at<uchar>(i, j1) - gray.at<uchar>(i, j2);
+			blurH.at<uchar>(i, j) = round(val * iarr);
+		}
+	}
+
+	//Vertical
+	for (size_t j = 0; j < gray.cols; ++j) {
+		double val = 0;
+		// first value
+		for (size_t i = 1; i < r + 1; ++i) {
+			val += blurH.at<uchar>(i, j);
+		}
+		for (size_t i = 0; i < r - 1; ++i) {
+			val += blurH.at<uchar>(i, j);
+		}
+
+		// from 0 to rows
+		for (size_t i = 0; i < gray.rows; ++i) {
+			int i1 = gray.rows - 1 - abs((int)(i - gray.rows + 1 + r));
+			int i2 = abs((int)(r - i + 1));
+			val += blurH.at<uchar>(i1, j) - blurH.at<uchar>(i2, j);
+			blur.at<uchar>(i, j) = round(val * iarr);
 		}
 	}
 }
@@ -914,30 +968,14 @@ void FitEllipse(InputArray _object, vector<float> &ellipse_M, vector<float> &ell
 	}
 }
 
-bool AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> &ellipse_M, vector<float> &ellipse_L)
+void AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> &ellipse_M, vector<float> &ellipse_L)
 {
-	/**** Image Pre-Processing ****/
-
-	/* Convert RGB Image to Gray */
-
-#ifdef OUTPUTTIME
-	time1 = clock();
-#endif // OUTPUTTIME
 
 	Mat gray;			//8UC1
 	RGBToGray(image, gray);
 
 #ifdef OUTPUTTIME
 	time2 = clock();
-	cout << "Convert RGB Image to Gray : " << (float)(time2 - time1) / CLOCKS_PER_SEC << " s" << endl;
-#endif // OUTPUTTIME
-
-	/**** Area-Based Image Extraction ****/
-
-	/* Bluring Image */
-
-#ifdef OUTPUTTIME
-	time1 = clock();
 #endif // OUTPUTTIME
 
 	size_t ksize = round(mumax * 5);
@@ -945,19 +983,10 @@ bool AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> 
 	double sigma = ksize / 6.07;
 
 	Mat grayBlur;			//8UC1
-							//cv::GaussianBlur(grayWarp, grayBlur, Size(ksize, ksize), sigma, sigma, BORDER_REFLECT_101);
-							//GaussianBlurM(grayWarp, grayBlur, ksize, sigma);
 	GaussianBlurF(gray, grayBlur, sigma, 5);
 
 #ifdef OUTPUTTIME
 	time2 = clock();
-	cout << "Bluring Image : " << (float)(time2 - time1) / CLOCKS_PER_SEC << " s" << endl;
-#endif // OUTPUTTIME
-
-	/* Remove Ambient Light for Area */
-
-#ifdef OUTPUTTIME
-	time1 = clock();
 #endif // OUTPUTTIME
 
 	Mat grayDIV;			//8UC1
@@ -965,13 +994,6 @@ bool AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> 
 
 #ifdef OUTPUTTIME
 	time2 = clock();
-	cout << "Remove Ambient Light for Area : " << (float)(time2 - time1) / CLOCKS_PER_SEC << " s" << endl;
-#endif // OUTPUTTIME
-
-	/* Otsu Threshold */
-
-#ifdef OUTPUTTIME
-	time1 = clock();
 #endif // OUTPUTTIME
 
 	Mat grayTH;			//8UC1(BW)
@@ -979,28 +1001,6 @@ bool AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> 
 
 #ifdef OUTPUTTIME
 	time2 = clock();
-	cout << "Kittler Threshold : " << (float)(time2 - time1) / CLOCKS_PER_SEC << " s" << endl;
-#endif // OUTPUTTIME
-
-	/* Area */
-
-#ifdef OUTPUTTIME
-	time1 = clock();
-#endif // OUTPUTTIME
-
-	Mat area = grayTH;			//8UC1(BW)
-
-#ifdef OUTPUTTIME
-	time2 = clock();
-	cout << "Area : " << (float)(time2 - time1) / CLOCKS_PER_SEC << " s" << endl;
-#endif // OUTPUTTIME
-
-	/**** Line-Based Image Extraction ****/
-
-	/* Calculate Image Gradient */
-
-#ifdef OUTPUTTIME
-	time1 = clock();
 #endif // OUTPUTTIME
 
 	Mat gradm;			//8UC1
@@ -1008,13 +1008,6 @@ bool AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> 
 
 #ifdef OUTPUTTIME
 	time2 = clock();
-	cout << "Calculate Image Gradient : " << (float)(time2 - time1) / CLOCKS_PER_SEC << " s" << endl;
-#endif // OUTPUTTIME
-
-	/* Bluring Image Gradient */
-
-#ifdef OUTPUTTIME
-	time1 = clock();
 #endif // OUTPUTTIME
 
 	Mat gradmBlur;			//8UC1
@@ -1022,13 +1015,6 @@ bool AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> 
 
 #ifdef OUTPUTTIME
 	time2 = clock();
-	cout << "Bluring Image Gradient : " << (float)(time2 - time1) / CLOCKS_PER_SEC << " s" << endl;
-#endif // OUTPUTTIME
-
-	/* Remove Ambient Light And Binary for Image Gradient */
-
-#ifdef OUTPUTTIME
-	time1 = clock();
 #endif // OUTPUTTIME
 
 	Mat gradmDB;			//8UC1
@@ -1036,57 +1022,24 @@ bool AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> 
 
 #ifdef OUTPUTTIME
 	time2 = clock();
-	cout << "Remove Ambient Light And Binary for Image Gradient : " << (float)(time2 - time1) / CLOCKS_PER_SEC << " s" << endl;
-#endif // OUTPUTTIME
-
-	/* Hysteresis Cut Binary Image to Line by Area */
-
-#ifdef OUTPUTTIME
-	time1 = clock();
 #endif // OUTPUTTIME
 
 	Mat lineHC;			//8UC1(BW)
-	HysteresisCut(gradmDB, area, lineHC);
+	HysteresisCut(gradmDB, grayTH, lineHC);
 
 #ifdef OUTPUTTIME
 	time2 = clock();
-	cout << "Hysteresis Cut Binary Image to Line by Area : " << (float)(time2 - time1) / CLOCKS_PER_SEC << " s" << endl;
 #endif // OUTPUTTIME
-
-	/* Line */
-
-#ifdef OUTPUTTIME
-	time1 = clock();
-#endif // OUTPUTTIME
-
-	Mat line(lineHC.size(), CV_8UC1);			//8UC1(BW)
-	lineHC.copyTo(line);
 
 #ifdef OUTPUTTIME
 	time2 = clock();
-	cout << "Line : " << (float)(time2 - time1) / CLOCKS_PER_SEC << " s" << endl;
-#endif // OUTPUTTIME
-
-	/**** Combine Image Extraction ****/
-
-	/* Combine Area and Line */
-
-#ifdef OUTPUTTIME
-	time1 = clock();
 #endif // OUTPUTTIME
 
 	Mat objectCOM;			//8UC1(BW)
-	Combine(area, line, objectCOM);
+	Combine(grayTH, lineHC, objectCOM);
 
 #ifdef OUTPUTTIME
 	time2 = clock();
-	cout << "Combine Area and Line : " << (float)(time2 - time1) / CLOCKS_PER_SEC << " s" << endl;
-#endif // OUTPUTTIME
-
-	/* Image morphology Opening */
-
-#ifdef OUTPUTTIME
-	time1 = clock();
 #endif // OUTPUTTIME
 
 	Mat objectOpen;			//8UC1(BW)
@@ -1095,13 +1048,6 @@ bool AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> 
 
 #ifdef OUTPUTTIME
 	time2 = clock();
-	cout << "Image morphology Opening : " << (float)(time2 - time1) / CLOCKS_PER_SEC << " s" << endl;
-#endif // OUTPUTTIME
-
-	/* Clear Noise of Black Pepper */
-
-#ifdef OUTPUTTIME
-	time1 = clock();
 #endif // OUTPUTTIME
 
 	Mat objectCN;			//8UC1(BW)
@@ -1109,15 +1055,6 @@ bool AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> 
 
 #ifdef OUTPUTTIME
 	time2 = clock();
-	cout << "Clear Noise of Black Pepper : " << (float)(time2 - time1) / CLOCKS_PER_SEC << " s" << endl;
-#endif // OUTPUTTIME
-
-	/**** Watershed Algorithm ****/
-
-	/* Distance Transform */
-
-#ifdef OUTPUTTIME
-	time1 = clock();
 #endif // OUTPUTTIME
 
 	Mat objectDT;		//32FC1
@@ -1125,13 +1062,6 @@ bool AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> 
 
 #ifdef OUTPUTTIME
 	time2 = clock();
-	cout << "Distance Transform : " << (float)(time2 - time1) / CLOCKS_PER_SEC << " s" << endl;
-#endif // OUTPUTTIME
-
-	/* Extend Local Minima */
-
-#ifdef OUTPUTTIME
-	time1 = clock();
 #endif // OUTPUTTIME
 
 	Mat objectEM;		//8UC1(BW)
@@ -1139,13 +1069,6 @@ bool AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> 
 
 #ifdef OUTPUTTIME
 	time2 = clock();
-	cout << "Extend Local Minima : " << (float)(time2 - time1) / CLOCKS_PER_SEC << " s" << endl;
-#endif // OUTPUTTIME
-
-	/* Add unlabeled labels */
-
-#ifdef OUTPUTTIME
-	time1 = clock();
 #endif // OUTPUTTIME
 
 	Mat objectAS;		//8UC1(BW)
@@ -1153,13 +1076,6 @@ bool AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> 
 
 #ifdef OUTPUTTIME
 	time2 = clock();
-	cout << "Add unlabeled labels : " << (float)(time2 - time1) / CLOCKS_PER_SEC << " s" << endl;
-#endif // OUTPUTTIME
-
-	/* Watershed Segmentation */
-
-#ifdef OUTPUTTIME
-	time1 = clock();
 #endif // OUTPUTTIME
 
 	Mat objectWT;		//8UC1(BW)
@@ -1167,15 +1083,6 @@ bool AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> 
 
 #ifdef OUTPUTTIME
 	time2 = clock();
-	cout << "Watershed Segmentation : " << (float)(time2 - time1) / CLOCKS_PER_SEC << " s" << endl;
-#endif // OUTPUTTIME
-
-	/**** Particle Post-Calculation ****/
-
-	/* Delete Edge object */
-
-#ifdef OUTPUTTIME
-	time1 = clock();
 #endif // OUTPUTTIME
 
 	Mat objectDE;		//8UC1(BW)
@@ -1183,19 +1090,11 @@ bool AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> 
 
 #ifdef OUTPUTTIME
 	time2 = clock();
-	cout << "Delete Edge object : " << (float)(time2 - time1) / CLOCKS_PER_SEC << " s" << endl;
-#endif // OUTPUTTIME
-
-	/* Fitting Ellipse */
-
-#ifdef OUTPUTTIME
-	time1 = clock();
 #endif // OUTPUTTIME
 
 	FitEllipse(objectDE, ellipse_M, ellipse_L);
 
 #ifdef OUTPUTTIME
 	time2 = clock();
-	cout << "Fitting Ellipse : " << (float)(time2 - time1) / CLOCKS_PER_SEC << " s" << endl;
 #endif // OUTPUTTIME
 }

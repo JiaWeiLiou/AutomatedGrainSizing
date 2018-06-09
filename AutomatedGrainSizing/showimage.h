@@ -47,8 +47,12 @@ public:
 	QImage showImage;								// image to show
 	QImage rawImage;								// store raw image
 	QImage warpImage;								// store transform image
+	cv::Mat perspectiveMatrix;							// perspective projection transform matrix
 	void initial();									// initial and rest widget
 	void clearPoints();								// clear points
+	void perspectiveTransform();						// perspective projection transform
+	QImage ShowImage::Mat2QImage(const cv::Mat& mat);	// Mat to QImage
+	cv::Mat ShowImage::QImage2Mat(QImage image);		// QImage to Mat
 
 protected:
 	void resizeEvent(QResizeEvent *event);		// window resize
@@ -72,10 +76,6 @@ private:
 	QPointF realSize;									// record lineEdit size
 	int checkBoxState = 0;								// record checkBox state
 	bool image4PointModified = 1;						// record 4 points modified
-	cv::Mat perspectiveMatrix;							// perspective projection transform matrix
-	void perspectiveTransform();						// perspective projection transform
-	QImage ShowImage::Mat2QImage(const cv::Mat& mat);	// Mat to QImage
-	cv::Mat ShowImage::QImage2Mat(QImage image);		// QImage to Mat
 
 signals:
 	void pointsNumberChanged();			// points change

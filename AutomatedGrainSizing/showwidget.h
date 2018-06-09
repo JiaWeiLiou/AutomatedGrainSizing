@@ -11,6 +11,7 @@
 #include <QString>
 #include <QPointF>
 #include "showimage.h"
+#include "automatedgrainsizing.h"
 
 class ShowWidget : public QWidget
 {
@@ -27,6 +28,10 @@ public:
 	QLineEdit *heightLineEdit;
 	QLabel *hUintLabel;
 	QPushButton *startPushButton;
+	QPointF realSize;
+	int mumax;
+	vector<float> ellipseM;
+	vector<float> ellipseL;
 
 signals:
 	void emitRealSize(QPointF);
@@ -34,4 +39,5 @@ signals:
 private slots:
 	void setWidgetEnable();
 	void setLineEditEnable(int checkBoxState);
+	void automatedGrainSizing();
 };

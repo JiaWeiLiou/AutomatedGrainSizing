@@ -38,6 +38,12 @@ int bwlabel(InputArray _binary, OutputArray _labelImg, int nears);
 //gray : gray image (8UC1)
 void RGBToGray(InputArray _image, OutputArray _gray);
 
+//Box Blur
+//gray : gray image (8UC1)
+//blur : blur image (8UC1)
+//r : radius of box
+void boxBlurM(InputArray _gray, OutputArray _blur, size_t r);
+
 //Fast Gaussian Blur
 //gray : gray image (8UC1)
 //blur : blur image (8UC1)
@@ -180,4 +186,4 @@ void DeleteEdge(InputArray _binary, OutputArray _object);
 //ellipse_L : long axis of ellipse
 void FitEllipse(InputArray _object, vector<float> &ellipse_M, vector<float> &ellipse_L);
 
-bool AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> &ellipse_M, vector<float> &ellipse_L);
+void AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> &ellipse_M, vector<float> &ellipse_L);
