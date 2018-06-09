@@ -26,8 +26,8 @@
 #include <cmath>
 #include <opencv2/opencv.hpp>
 
-#define imgW (imgS.size().width())	// image width
-#define imgH (imgS.size().height())	// image height
+#define imgW (showImage.size().width())	// image width
+#define imgH (showImage.size().height())	// image height
 #define winW (width())				// window width
 #define winH (height())				// window height
 
@@ -37,13 +37,17 @@ class ShowImage: public QWidget
 
 public:
 	ShowImage(QWidget *parent = Q_NULLPTR);
-	QVector<QPointF> image4Points;				// record 4 image points' pixel
-	QVector<QPointF> image2Points;				// record 2 image points' pixel
-	bool loading = false;						// loading file
-	QImage imgS;								// image to show
-	QImage imgB;								// store raw image
-	QImage imgA;								// store transform image
-	void initial();								// initial and rest widget
+	QVector<QPointF> showImage4Points;				// show 4 image points' pixel
+	QVector<QPointF> showImage2Points;				// ahow 2 image points' pixel
+	QVector<QPointF> rawImage4Points;				// record 4  raw image points' pixel
+	QVector<QPointF> rawImage2Points;				// record 2  raw image points' pixel
+	QVector<QPointF> warpImage4Points;				// record 4 warp image points' pixel
+	QVector<QPointF> warpImage2Points;				// record 2 warp image points' pixel
+	bool loading = false;							// loading file
+	QImage showImage;								// image to show
+	QImage rawImage;								// store raw image
+	QImage warpImage;								// store transform image
+	void initial();									// initial and rest widget
 
 protected:
 	void resizeEvent(QResizeEvent *event);		// window resize
@@ -73,8 +77,8 @@ private:
 	bool modified;			// record point is modified or not
 	char modifyState;		// record modify state of points
 	QPointF realSize;		// record lineEdit size
-	int state;				// record checkBox state
-	void doPPT();			// do perspective projection transform
+	int state = 0;			// record checkBox state
+	void perspectiveTransform();			// do perspective projection transform
 	QImage ShowImage::Mat2QImage(const cv::Mat& mat);	// Mat to QImage
 	cv::Mat ShowImage::QImage2Mat(QImage image);		// QImage to Mat
 };

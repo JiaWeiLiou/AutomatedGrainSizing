@@ -40,8 +40,8 @@ void ShowMainWindow::dropEvent(QDropEvent *event)
 
 	showWidget->imageWidget->loading = true;			// show loading
 	showWidget->imageWidget->initial();					// initial image widget
-	showWidget->imageWidget->imgB.load(filePathName);	// store image's
-	showWidget->imageWidget->imgS = showWidget->imageWidget->imgB;
+	showWidget->imageWidget->rawImage.load(filePathName);	// store image's
+	showWidget->imageWidget->showImage = showWidget->imageWidget->rawImage;
 	showWidget->imageWidget->loading = false;			// show loading
 	showWidget->imageWidget->initial();					// initial image widget
 }

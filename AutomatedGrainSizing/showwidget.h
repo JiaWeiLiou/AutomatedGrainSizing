@@ -20,7 +20,7 @@ public:
 	ShowImage *imageWidget;
 
 private:
-	QCheckBox *pptCheckBox;
+	QCheckBox *warpCheckBox;
 	QLabel *widthLabel;
 	QLineEdit *widthLineEdit;
 	QLabel *wuintLabel;
@@ -28,7 +28,6 @@ private:
 	QLineEdit *heightLineEdit;
 	QLabel *huintLabel;
 	QPushButton *startPushButton;
-	size_t pointNum;
 
 private slots:
 	void setWidgetEnable(size_t);

@@ -10,8 +10,8 @@ ShowWidget::ShowWidget(QWidget *parent)
 	imageWidget->setFocusPolicy(Qt::ClickFocus);
 	imageWidget->setMinimumSize(600, 400);
 	imageWidget->setStyleSheet("border: 1px solid lightgray;");
-	pptCheckBox = new QCheckBox("Perspective Projection Transform");
-	pptCheckBox->setEnabled(false);
+	warpCheckBox = new QCheckBox("Perspective Projection Transform");
+	warpCheckBox->setEnabled(false);
 	QRegExp rx("^[0-9]*[1-9][0-9]*$");
 	QValidator *validator = new QRegExpValidator(rx, this);
 	widthLabel = new QLabel("Width");
@@ -30,7 +30,7 @@ ShowWidget::ShowWidget(QWidget *parent)
 	startPushButton->setMinimumWidth(100);
 	startPushButton->setEnabled(false);
 	QHBoxLayout *hLayout = new QHBoxLayout;
-	hLayout->addWidget(pptCheckBox);
+	hLayout->addWidget(warpCheckBox);
 	hLayout->addSpacing(20);
 	hLayout->addStretch(5);
 	hLayout->addWidget(heightLabel);
@@ -51,22 +51,21 @@ ShowWidget::ShowWidget(QWidget *parent)
 	connect(heightLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setWidgetEnable()));
 	connect(widthLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setWidgetEnable()));
 	connect(this, SIGNAL(emitRealSize(QPointF)), imageWidget, SLOT(getRealSize(QPointF)));
-	connect(pptCheckBox, SIGNAL(stateChanged(int)), imageWidget, SLOT(getState(int)));
+	connect(warpCheckBox, SIGNAL(stateChanged(int)), imageWidget, SLOT(getState(int)));
 }
 
 void ShowWidget::setWidgetEnable(size_t num)
 {
-	pointNum = num;
 	int Wvalue = widthLineEdit->text().toInt();
 	int Hvalue = heightLineEdit->text().toInt();
-	if (pointNum >= 4 && Wvalue > 0 && Hvalue > 0) {
-		pptCheckBox->setEnabled(true);
+	if (num >= 4 && Wvalue > 0 && Hvalue > 0) {
+		warpCheckBox->setEnabled(true);
 		emit emitRealSize(QPointF(Wvalue, Hvalue));
 	} else {
-		pptCheckBox->setEnabled(false);
+		warpCheckBox->setEnabled(false);
 	}
 
-	if (pointNum == 6 && Wvalue > 0 && Hvalue > 0) {
+	if (num == 6 && Wvalue > 0 && Hvalue > 0) {
 		startPushButton->setEnabled(true);
 	} else {
 		startPushButton->setEnabled(false);
@@ -77,12 +76,12 @@ void ShowWidget::setWidgetEnable()
 {
 	int Hvalue = heightLineEdit->text().toInt();
 	int Wvalue = widthLineEdit->text().toInt();
-	if (pointNum >= 4 && Hvalue > 0 && Wvalue > 0) {
-		pptCheckBox->setEnabled(true);
+	if (imageWidget->rawImage4Points.size() >= 4 && Hvalue > 0 && Wvalue > 0) {
+		warpCheckBox->setEnabled(true);
 	} else {
-		pptCheckBox->setEnabled(false);
+		warpCheckBox->setEnabled(false);
 	}
-	if (pointNum == 6 && Hvalue > 0 && Wvalue > 0) {
+	if (imageWidget->rawImage2Points.size() >= 2 && Hvalue > 0 && Wvalue > 0) {
 		startPushButton->setEnabled(true);
 	} else {
 		startPushButton->setEnabled(false);
