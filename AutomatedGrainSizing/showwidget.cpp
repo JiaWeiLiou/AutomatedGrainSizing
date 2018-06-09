@@ -47,41 +47,25 @@ ShowWidget::ShowWidget(QWidget *parent)
 	mainLayout->addWidget(imageWidget);
 	mainLayout->addLayout(hLayout);
 
-	connect(imageWidget, SIGNAL(pointsChange(size_t)), this, SLOT(setWidgetEnable(size_t)));
+	connect(imageWidget, SIGNAL(pointsNumberChanged()), this, SLOT(setWidgetEnable()));
 	connect(heightLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setWidgetEnable()));
 	connect(widthLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setWidgetEnable()));
 	connect(this, SIGNAL(emitRealSize(QPointF)), imageWidget, SLOT(getRealSize(QPointF)));
-	connect(warpCheckBox, SIGNAL(stateChanged(int)), imageWidget, SLOT(getState(int)));
+	connect(warpCheckBox, SIGNAL(stateChanged(int)), imageWidget, SLOT(getCheckBoxState(int)));
 }
 
-void ShowWidget::setWidgetEnable(size_t num)
+void ShowWidget::setWidgetEnable()
 {
 	int Wvalue = widthLineEdit->text().toInt();
 	int Hvalue = heightLineEdit->text().toInt();
-	if (num >= 4 && Wvalue > 0 && Hvalue > 0) {
+	if (imageWidget->rawImage4Points.size() == 4 && Wvalue > 0 && Hvalue > 0) {
 		warpCheckBox->setEnabled(true);
 		emit emitRealSize(QPointF(Wvalue, Hvalue));
 	} else {
 		warpCheckBox->setEnabled(false);
 	}
 
-	if (num == 6 && Wvalue > 0 && Hvalue > 0) {
-		startPushButton->setEnabled(true);
-	} else {
-		startPushButton->setEnabled(false);
-	}
-}
-
-void ShowWidget::setWidgetEnable()
-{
-	int Hvalue = heightLineEdit->text().toInt();
-	int Wvalue = widthLineEdit->text().toInt();
-	if (imageWidget->rawImage4Points.size() >= 4 && Hvalue > 0 && Wvalue > 0) {
-		warpCheckBox->setEnabled(true);
-	} else {
-		warpCheckBox->setEnabled(false);
-	}
-	if (imageWidget->rawImage2Points.size() >= 2 && Hvalue > 0 && Wvalue > 0) {
+	if (imageWidget->rawImage2Points.size() == 2 && Wvalue > 0 && Hvalue > 0) {
 		startPushButton->setEnabled(true);
 	} else {
 		startPushButton->setEnabled(false);

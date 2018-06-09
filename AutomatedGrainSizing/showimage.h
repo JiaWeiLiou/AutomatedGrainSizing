@@ -58,27 +58,28 @@ protected:
 	void keyPressEvent(QKeyEvent *event);		// keyboard press	(overload from QWidget)
 	void paintEvent(QPaintEvent *event);		// drawing the result
 
-signals:
-	void pointsChange(size_t);					// points change
-
-private slots:
-	void getRealSize(QPointF);	// get lineEdit size
-	void getState(int);			// get checkbox state
-
 private:
-	float maxScale = 0.0f;	// maximum scale
-	float minScale = 0.0f;	// minimun scale
-	float scale = 0.0f;		// scale to draw
-	QPointF newDelta;		// new displacement
-	QPointF oldDelta;		// old displacement
-	QPointF pos1;			// mouse press position 1
-	QPointF pos2;			// mouse press position 2
-	bool outBorder;			// record point is out of border or not
-	bool modified;			// record point is modified or not
-	char modifyState;		// record modify state of points
-	QPointF realSize;		// record lineEdit size
-	int state = 0;			// record checkBox state
-	void perspectiveTransform();			// do perspective projection transform
+	float maxScale = 0.0f;								// maximum scale
+	float minScale = 0.0f;								// minimun scale
+	float scale = 0.0f;									// scale to draw
+	QPointF newDelta;									// new displacement
+	QPointF oldDelta;									// old displacement
+	QPointF pos1;										// mouse press position 1
+	QPointF pos2;										// mouse press position 2
+	bool outBorder = 0;									// record point is out of border or not
+	int modifiedPointState;								// record modify of points (0 to 6, 0 is not modified)
+	bool image4PointsFull = 0;							// image 4 points full
+	bool image2PointsFull = 0;							// image 2 points full
+	QPointF realSize;									// record lineEdit size
+	int checkBoxState = 0;								// record checkBox state
+	void perspectiveTransform();						// perspective projection transform
 	QImage ShowImage::Mat2QImage(const cv::Mat& mat);	// Mat to QImage
 	cv::Mat ShowImage::QImage2Mat(QImage image);		// QImage to Mat
+
+signals:
+	void pointsNumberChanged();			// points change
+
+private slots:
+	void getRealSize(QPointF);			// get lineEdit size
+	void getCheckBoxState(int);			// get checkbox state
 };

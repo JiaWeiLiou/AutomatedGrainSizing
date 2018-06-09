@@ -32,8 +32,8 @@ void ShowMainWindow::dropEvent(QDropEvent *event)
 
 	if (!filePathName.isEmpty()) {
 		int pos1 = filePathName.lastIndexOf('/');
-		filePath = filePath.left(pos1 + 1);									//檔案路徑
-		fileName = filePathName.right(filePathName.size() - pos1 - 1);		//檔案名稱
+		filePath = filePath.left(pos1 + 1);									//file path
+		fileName = filePathName.right(filePathName.size() - pos1 - 1);		//file name
 	}
 
 	setWindowTitle(fileName + QString(" - Automated Grain Sizing"));

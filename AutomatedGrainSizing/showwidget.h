@@ -29,10 +29,9 @@ private:
 	QLabel *huintLabel;
 	QPushButton *startPushButton;
 
-private slots:
-	void setWidgetEnable(size_t);
-	void setWidgetEnable();
-
 signals:
 	void emitRealSize(QPointF);
+
+private slots:
+	void setWidgetEnable();
 };
