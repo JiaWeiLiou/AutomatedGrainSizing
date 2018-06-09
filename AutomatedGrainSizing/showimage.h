@@ -37,8 +37,6 @@ class ShowImage: public QWidget
 
 public:
 	ShowImage(QWidget *parent = Q_NULLPTR);
-	QVector<QPointF> showImage4Points;				// show 4 image points' pixel
-	QVector<QPointF> showImage2Points;				// ahow 2 image points' pixel
 	QVector<QPointF> rawImage4Points;				// record 4  raw image points' pixel
 	QVector<QPointF> rawImage2Points;				// record 2  raw image points' pixel
 	QVector<QPointF> warpImage4Points;				// record 4 warp image points' pixel
@@ -48,6 +46,7 @@ public:
 	QImage rawImage;								// store raw image
 	QImage warpImage;								// store transform image
 	void initial();									// initial and rest widget
+	void clearPoints();								// clear points
 
 protected:
 	void resizeEvent(QResizeEvent *event);		// window resize
@@ -66,12 +65,14 @@ private:
 	QPointF oldDelta;									// old displacement
 	QPointF pos1;										// mouse press position 1
 	QPointF pos2;										// mouse press position 2
-	bool outBorder = 0;									// record point is out of border or not
-	int modifiedPointState;								// record modify of points (0 to 6, 0 is not modified)
 	bool image4PointsFull = 0;							// image 4 points full
 	bool image2PointsFull = 0;							// image 2 points full
+	bool outBorder = 0;									// record point is out of border or not
+	int modifiedPointState;								// record modify of points (0 to 6, 0 is not modified)
 	QPointF realSize;									// record lineEdit size
 	int checkBoxState = 0;								// record checkBox state
+	bool image4PointModified = 1;						// record 4 points modified
+	cv::Mat perspectiveMatrix;							// perspective projection transform matrix
 	void perspectiveTransform();						// perspective projection transform
 	QImage ShowImage::Mat2QImage(const cv::Mat& mat);	// Mat to QImage
 	cv::Mat ShowImage::QImage2Mat(QImage image);		// QImage to Mat
@@ -80,6 +81,6 @@ signals:
 	void pointsNumberChanged();			// points change
 
 private slots:
-	void getRealSize(QPointF);			// get lineEdit size
-	void getCheckBoxState(int);			// get checkbox state
+	void getRealSize(QPointF size);			// get lineEdit size
+	void getCheckBoxState(int checkBoxState);			// get checkbox state
 };

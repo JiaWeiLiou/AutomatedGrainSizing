@@ -4,6 +4,7 @@ ShowImage::ShowImage(QWidget *parent)
 	: QWidget(parent)
 {
 	initial();
+	clearPoints();
 	setMouseTracking(true);								// tracking mouse location
 }
 
@@ -25,12 +26,25 @@ void ShowImage::initial()
 		scale = minScale;
 	}
 
-	/* clear rawImage4Points */
-	rawImage4Points.clear();
-	rawImage2Points.clear();
-	emit pointsNumberChanged();
-
 	repaint();
+}
+
+void ShowImage::clearPoints()
+{
+	/* clear points */
+	if (checkBoxState == Qt::Unchecked) {
+		rawImage4Points.clear();
+		rawImage2Points.clear();
+		image4PointsFull = 0;
+		image2PointsFull = 0;
+		image4PointModified = 1;
+		emit pointsNumberChanged();
+	} else {
+		warpImage2Points.clear();
+		image2PointsFull = 0;
+		emit pointsNumberChanged();
+	}
+
 }
 
 void ShowImage::resizeEvent(QResizeEvent *event)
@@ -98,44 +112,96 @@ void ShowImage::mousePressEvent(QMouseEvent *event)
 		// set point's location can be mod
 		modifiedPointState = 0;
 
+		if (checkBoxState == Qt::Unchecked) {
 		// mod 4 points
-		for (size_t i = 0; i < rawImage4Points.size(); ++i) {
-			QPointF pixelPos = rawImage4Points[i] * scale + newDelta;
-			QPointF mousePos = QPointF(event->pos());
-			// distance lower than 5
-			if (qSqrt(qPow(mousePos.x() - pixelPos.x(), 2) + qPow(mousePos.y() - pixelPos.y(), 2)) < 5) {
-				setCursor(Qt::CrossCursor);										// set cursor to cross type
-				QPointF imagePos = (mousePos - newDelta) / scale;	// change to image's pixel coordinate
-				// limit the point in the image
-				if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
-					// record file.
-					rawImage4Points[i] = imagePos;
-					outBorder = false;
-					modifiedPointState = i + 1;
-					update();
-				} else {
-					outBorder = true;
-				}
-				break;
-			}
-		}
-
-		// mod 2 points
-		if (!modifiedPointState) {
-			for (size_t i = 0; i < rawImage2Points.size(); ++i) {
-				QPointF pixelPos = rawImage2Points[i] * scale + newDelta;
+			for (size_t i = 0; i < rawImage4Points.size(); ++i) {
+				QPointF pixelPos = rawImage4Points[i] * scale + newDelta;
 				QPointF mousePos = QPointF(event->pos());
 				// distance lower than 5
 				if (qSqrt(qPow(mousePos.x() - pixelPos.x(), 2) + qPow(mousePos.y() - pixelPos.y(), 2)) < 5) {
 					setCursor(Qt::CrossCursor);										// set cursor to cross type
 					QPointF imagePos = (mousePos - newDelta) / scale;	// change to image's pixel coordinate
-																		// limit the point in the image
+					// limit the point in the image
 					if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
 						// record file.
-						rawImage2Points[i] = imagePos;
-						//if (rawImage2Points.size() == 3 && i == 0) {
-						//	rawImage2Points[2] = imagePos;	// modify end point
-						//}
+						rawImage4Points[i] = imagePos;
+						image4PointModified = 1;
+						outBorder = false;
+						modifiedPointState = i + 1;
+						update();
+					} else {
+						outBorder = true;
+					}
+					break;
+				}
+			}
+
+			// mod 2 points
+			if (!modifiedPointState) {
+				for (size_t i = 0; i < rawImage2Points.size(); ++i) {
+					QPointF pixelPos = rawImage2Points[i] * scale + newDelta;
+					QPointF mousePos = QPointF(event->pos());
+					// distance lower than 5
+					if (qSqrt(qPow(mousePos.x() - pixelPos.x(), 2) + qPow(mousePos.y() - pixelPos.y(), 2)) < 5) {
+						setCursor(Qt::CrossCursor);										// set cursor to cross type
+						QPointF imagePos = (mousePos - newDelta) / scale;	// change to image's pixel coordinate
+						// limit the point in the image
+						if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
+							// record file.
+							rawImage2Points[i] = imagePos;
+							outBorder = false;
+							modifiedPointState = i + 5;
+							update();
+						} else {
+							outBorder = true;
+						}
+						break;
+					}
+				}
+			}
+
+			// limit the point number to image
+			if (!modifiedPointState && !image4PointsFull) {
+				setCursor(Qt::CrossCursor);	// set cursor to cross type
+				QPointF imagePos = (QPointF(event->pos()) - newDelta) / scale;	// change to image's pixel coordinate
+				// limit the point in the image
+				if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
+					// record file.
+					rawImage4Points.push_back(imagePos);
+					image4PointModified = 1;
+					emit pointsNumberChanged();
+					outBorder = false;
+					update();
+				} else {
+					outBorder = true;
+				}
+			} else if (!modifiedPointState && !image2PointsFull) {
+				setCursor(Qt::CrossCursor);	// set cursor to cross type
+				QPointF imagePos = (QPointF(event->pos()) - newDelta) / scale;	// change to image's pixel coordinate
+				// limit the point in the image
+				if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
+					// record file.
+					rawImage2Points.push_back(imagePos);
+					emit pointsNumberChanged();
+					outBorder = false;
+					update();
+				} else {
+					outBorder = true;
+				}
+			}
+		} else {
+			// mod 2 points
+			for (size_t i = 0; i < warpImage2Points.size(); ++i) {
+				QPointF pixelPos = warpImage2Points[i] * scale + newDelta;
+				QPointF mousePos = QPointF(event->pos());
+				// distance lower than 5
+				if (qSqrt(qPow(mousePos.x() - pixelPos.x(), 2) + qPow(mousePos.y() - pixelPos.y(), 2)) < 5) {
+					setCursor(Qt::CrossCursor);										// set cursor to cross type
+					QPointF imagePos = (mousePos - newDelta) / scale;	// change to image's pixel coordinate
+					// limit the point in the image
+					if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
+						// record file.
+						warpImage2Points[i] = imagePos;
 						outBorder = false;
 						modifiedPointState = i + 5;
 						update();
@@ -145,34 +211,19 @@ void ShowImage::mousePressEvent(QMouseEvent *event)
 					break;
 				}
 			}
-		}
-
-		// limit the point number to image
-		if (!modifiedPointState && !image4PointsFull) {
-			setCursor(Qt::CrossCursor);	// set cursor to cross type
-			QPointF imagePos = (QPointF(event->pos()) - newDelta) / scale;	// change to image's pixel coordinate
-			// limit the point in the image
-			if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
-				// record file.
-				rawImage4Points.push_back(imagePos);
-				emit pointsNumberChanged();
-				outBorder = false;
-				update();
-			} else {
-				outBorder = true;
-			}
-		} else if (!modifiedPointState && !image2PointsFull) {
-			setCursor(Qt::CrossCursor);	// set cursor to cross type
-			QPointF imagePos = (QPointF(event->pos()) - newDelta) / scale;	// change to image's pixel coordinate
-			// limit the point in the image
-			if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
-				// record file.
-				rawImage2Points.push_back(imagePos);
-				emit pointsNumberChanged();
-				outBorder = false;
-				update();
-			} else {
-				outBorder = true;
+			if (!modifiedPointState && !image2PointsFull) {
+				setCursor(Qt::CrossCursor);	// set cursor to cross type
+				QPointF imagePos = (QPointF(event->pos()) - newDelta) / scale;	// change to image's pixel coordinate
+				// limit the point in the image
+				if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
+					// record file.
+					warpImage2Points.push_back(imagePos);
+					emit pointsNumberChanged();
+					outBorder = false;
+					update();
+				} else {
+					outBorder = true;
+				}
 			}
 		}
 	}
@@ -193,77 +244,119 @@ void ShowImage::mouseMoveEvent(QMouseEvent *event)
 		update();
 		// set point
 	} else if (event->buttons() == Qt::RightButton && !showImage.isNull()) {
-		// set point's location can be mod
-		// mod 4 points
-		if (modifiedPointState > 0 && modifiedPointState <= 4) {
-			QPointF pixelPos = rawImage4Points[modifiedPointState - 1] * scale + newDelta;
-			QPointF mousePos = QPointF(event->pos());
-			// move distance lower than 50
-			if (qSqrt(qPow(mousePos.x() - pixelPos.x(), 2) + qPow(mousePos.y() - pixelPos.y(), 2)) < 50) {
-				setCursor(Qt::CrossCursor);	// set cursor to cross type
-				QPointF imagePos = (mousePos - newDelta) / scale;	// change to image's pixel coordinate
-				// limit the point in the image
-				if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
-					// record file.
-					rawImage4Points[modifiedPointState - 1] = imagePos;
-					outBorder = false;
-					update();
-				} else {
-					outBorder = true;
-				}
-			}
-		// mod 2 points
-		} else if (modifiedPointState > 4) {
-			QPointF pixelPos = rawImage2Points[modifiedPointState - 5] * scale + newDelta;
-			QPointF mousePos = QPointF(event->pos());
-			// move distance lower than 50
-			if (qSqrt(qPow(mousePos.x() - pixelPos.x(), 2) + qPow(mousePos.y() - pixelPos.y(), 2)) < 50) {
-				setCursor(Qt::CrossCursor);	// set cursor to cross type
-				QPointF imagePos = (mousePos - newDelta) / scale;	// change to image's pixel coordinate
-				// limit the point in the image
-				if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
-					// record file.
-					rawImage2Points[modifiedPointState - 5] = imagePos;
-					outBorder = false;
-					update();
-				} else {
-					outBorder = true;
-				}
-			}
-		}
 
-		// limit the point number to image
-		if (!modifiedPointState && !image4PointsFull) {
-			setCursor(Qt::CrossCursor);	// set cursor to cross type
-			QPointF imagePos = (QPointF(event->pos()) - newDelta) / scale;	// change to image's pixel coordinate
-			// limit the point in the image
-			if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
-				// record file.
-				// mousePress points is out of border 
-				if (outBorder) {
-					rawImage4Points.push_back(imagePos);
-					outBorder = false;
-					// mousePress points isn't out of border 
-				} else {
-					rawImage4Points[rawImage4Points.size() - 1] = imagePos;
+		if (checkBoxState == Qt::Unchecked) {
+			// set point's location can be mod
+			// mod 4 points
+			if (modifiedPointState > 0 && modifiedPointState <= 4) {
+				QPointF pixelPos = rawImage4Points[modifiedPointState - 1] * scale + newDelta;
+				QPointF mousePos = QPointF(event->pos());
+				// move distance lower than 50
+				if (qSqrt(qPow(mousePos.x() - pixelPos.x(), 2) + qPow(mousePos.y() - pixelPos.y(), 2)) < 50) {
+					setCursor(Qt::CrossCursor);	// set cursor to cross type
+					QPointF imagePos = (mousePos - newDelta) / scale;	// change to image's pixel coordinate
+					// limit the point in the image
+					if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
+						// record file.
+						rawImage4Points[modifiedPointState - 1] = imagePos;
+						image4PointModified = 1;
+						outBorder = false;
+						update();
+					} else {
+						outBorder = true;
+					}
 				}
-				update();
+			// mod 2 points
+			} else if (modifiedPointState > 4) {
+				QPointF pixelPos = rawImage2Points[modifiedPointState - 5] * scale + newDelta;
+				QPointF mousePos = QPointF(event->pos());
+				// move distance lower than 50
+				if (qSqrt(qPow(mousePos.x() - pixelPos.x(), 2) + qPow(mousePos.y() - pixelPos.y(), 2)) < 50) {
+					setCursor(Qt::CrossCursor);	// set cursor to cross type
+					QPointF imagePos = (mousePos - newDelta) / scale;	// change to image's pixel coordinate
+					// limit the point in the image
+					if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
+						// record file.
+						rawImage2Points[modifiedPointState - 5] = imagePos;
+						outBorder = false;
+						update();
+					} else {
+						outBorder = true;
+					}
+				}
 			}
-		} else if (!modifiedPointState && !image2PointsFull) {
-			setCursor(Qt::CrossCursor);	// set cursor to cross type
-			QPointF imagePos = (QPointF(event->pos()) - newDelta) / scale;	// change to image's pixel coordinate
-			// limit the point in the image
-			if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
-				// record file.
-				// mousePress points is out of border 
-				if (outBorder) {
-					rawImage2Points.push_back(imagePos);
-					outBorder = false;
-					// mousePress points isn't out of border 
-				} else {
-					rawImage2Points[rawImage2Points.size() - 1] = imagePos;
+
+			// limit the point number to image
+			if (!modifiedPointState && !image4PointsFull) {
+				setCursor(Qt::CrossCursor);	// set cursor to cross type
+				QPointF imagePos = (QPointF(event->pos()) - newDelta) / scale;	// change to image's pixel coordinate
+				// limit the point in the image
+				if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
+					// record file.
+					// mousePress points is out of border 
+					if (outBorder) {
+						rawImage4Points.push_back(imagePos);
+						image4PointModified = 1;
+						outBorder = false;
+						// mousePress points isn't out of border 
+					} else {
+						rawImage4Points[rawImage4Points.size() - 1] = imagePos;
+					}
+					update();
 				}
-				update();
+			} else if (!modifiedPointState && !image2PointsFull) {
+				setCursor(Qt::CrossCursor);	// set cursor to cross type
+				QPointF imagePos = (QPointF(event->pos()) - newDelta) / scale;	// change to image's pixel coordinate
+				// limit the point in the image
+				if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
+					// record file.
+					// mousePress points is out of border 
+					if (outBorder) {
+						rawImage2Points.push_back(imagePos);
+						outBorder = false;
+						// mousePress points isn't out of border 
+					} else {
+						rawImage2Points[rawImage2Points.size() - 1] = imagePos;
+					}
+					update();
+				}
+			}
+		} else {
+			// mod 2 points
+			if (modifiedPointState > 4) {
+				QPointF pixelPos = warpImage2Points[modifiedPointState - 5] * scale + newDelta;
+				QPointF mousePos = QPointF(event->pos());
+				// move distance lower than 50
+				if (qSqrt(qPow(mousePos.x() - pixelPos.x(), 2) + qPow(mousePos.y() - pixelPos.y(), 2)) < 50) {
+					setCursor(Qt::CrossCursor);	// set cursor to cross type
+					QPointF imagePos = (mousePos - newDelta) / scale;	// change to image's pixel coordinate
+					// limit the point in the image
+					if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
+						// record file.
+						warpImage2Points[modifiedPointState - 5] = imagePos;
+						outBorder = false;
+						update();
+					} else {
+						outBorder = true;
+					}
+				}
+			}
+			if (!modifiedPointState && !image2PointsFull) {
+				setCursor(Qt::CrossCursor);	// set cursor to cross type
+				QPointF imagePos = (QPointF(event->pos()) - newDelta) / scale;	// change to image's pixel coordinate
+				// limit the point in the image
+				if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
+					// record file.
+					// mousePress points is out of border 
+					if (outBorder) {
+						warpImage2Points.push_back(imagePos);
+						outBorder = false;
+						// mousePress points isn't out of border 
+					} else {
+						warpImage2Points[warpImage2Points.size() - 1] = imagePos;
+					}
+					update();
+				}
 			}
 		}
 	}
@@ -281,11 +374,11 @@ void ShowImage::mouseReleaseEvent(QMouseEvent *event)
 		oldDelta = newDelta;	// record the distance of drag image
 	} else if (event->button() == Qt::RightButton) {
 		modifiedPointState = 0;
-		if (rawImage4Points.size() >= 4) {
-			image4PointsFull = 1;
-		}
-		if (rawImage2Points.size() >= 2) {
-			image2PointsFull = 1;
+		if (checkBoxState == Qt::Unchecked) {
+			image4PointsFull = rawImage4Points.size() == 4 ? 1 : 0;
+			image2PointsFull = rawImage2Points.size() == 2 ? 1 : 0;
+		} else {
+			image2PointsFull = warpImage2Points.size() == 2 ? 1 : 0;
 		}
 	}
 	update();
@@ -295,23 +388,28 @@ void ShowImage::keyPressEvent(QKeyEvent *event)
 {
 	// press keyboard Esc to give up setting point
 	if (event->key() == Qt::Key_Escape) {
-		rawImage4Points.clear();	// clear 4 points
-		rawImage2Points.clear();	// clear 2 points
-		image4PointsFull = 0;
-		image2PointsFull = 0;
-		emit pointsNumberChanged();
+		clearPoints();
 		update();
 	} else if (event->key() == Qt::Key_Backspace) {
-		if (rawImage2Points.size()) {
-			rawImage2Points.pop_back();	// delete points
-			image2PointsFull = 0;
-			emit pointsNumberChanged();
-			update();
-		} else if (rawImage4Points.size()) {
-			rawImage4Points.pop_back();	// delete points
-			image4PointsFull = 0;
-			emit pointsNumberChanged();
-			update();
+		if (checkBoxState == Qt::Unchecked) {
+			if (rawImage2Points.size()) {
+				rawImage2Points.pop_back();	// delete points
+				image2PointsFull = 0;
+				emit pointsNumberChanged();
+				update();
+			} else if (rawImage4Points.size()) {
+				rawImage4Points.pop_back();	// delete points
+				image4PointsFull = 0;
+				emit pointsNumberChanged();
+				update();
+			}
+		} else {
+			if (warpImage2Points.size()) {
+				warpImage2Points.pop_back();	// delete points
+				image2PointsFull = 0;
+				emit pointsNumberChanged();
+				update();
+			}
 		}
 	}
 }
@@ -352,37 +450,52 @@ void ShowImage::paintEvent(QPaintEvent *event)
 		QRectF rect(newDelta.x() - 0.5 * scale, newDelta.y() - 0.5 * scale, imgW * scale, imgH * scale);	// draw range
 		painter.drawImage(rect, showImage);	// draw image
 	}
-	
+
+	if (checkBoxState == Qt::Unchecked) {
 	/* draw 4 line first */
-	if (rawImage4Points.size() > 1) {
-		for (int i = 0; i < rawImage4Points.size() - 1; ++i) {
-			painter.setPen(QPen(Qt::green, 3));
-			painter.drawLine(rawImage4Points[i] * scale + newDelta, rawImage4Points[(i + 1)] * scale + newDelta);
-			if (rawImage4Points.size() == 4) {
-				painter.drawLine(rawImage4Points[0] * scale + newDelta, rawImage4Points[3] * scale + newDelta);
+		if (rawImage4Points.size() > 1) {
+			for (int i = 0; i < rawImage4Points.size() - 1; ++i) {
+				painter.setPen(QPen(Qt::green, 3));
+				painter.drawLine(rawImage4Points[i] * scale + newDelta, rawImage4Points[(i + 1)] * scale + newDelta);
+				if (rawImage4Points.size() == 4) {
+					painter.drawLine(rawImage4Points[0] * scale + newDelta, rawImage4Points[3] * scale + newDelta);
+				}
 			}
 		}
-	}
 
-	/* draw 4 points second */
-	if (rawImage4Points.size() > 0) {
-		for (int i = 0; i < rawImage4Points.size(); ++i) {
-			painter.setPen(QPen(Qt::red, 5));
-			painter.drawPoint(rawImage4Points[i] * scale + newDelta);
+		/* draw 4 points second */
+		if (rawImage4Points.size() > 0) {
+			for (int i = 0; i < rawImage4Points.size(); ++i) {
+				painter.setPen(QPen(Qt::red, 5));
+				painter.drawPoint(rawImage4Points[i] * scale + newDelta);
+			}
 		}
-	}
 
-	/* draw 2 line first */
-	if (rawImage2Points.size() > 1) {
-		painter.setPen(QPen(Qt::blue, 3));
-		painter.drawLine(rawImage2Points[0] * scale + newDelta, rawImage2Points[1] * scale + newDelta);
-	}
+		/* draw 2 line first */
+		if (rawImage2Points.size() > 1) {
+			painter.setPen(QPen(Qt::blue, 3));
+			painter.drawLine(rawImage2Points[0] * scale + newDelta, rawImage2Points[1] * scale + newDelta);
+		}
 
-	/* draw 2 points second */
-	if (rawImage2Points.size() > 0) {
-		for (int i = 0; i < rawImage2Points.size(); ++i) {
-			painter.setPen(QPen(Qt::red, 5));
-			painter.drawPoint(rawImage2Points[i] * scale + newDelta);
+		/* draw 2 points second */
+		if (rawImage2Points.size() > 0) {
+			for (int i = 0; i < rawImage2Points.size(); ++i) {
+				painter.setPen(QPen(Qt::red, 5));
+				painter.drawPoint(rawImage2Points[i] * scale + newDelta);
+			}
+		}
+	} else {
+		/* draw 2 line first */
+		if (warpImage2Points.size() > 1) {
+			painter.setPen(QPen(Qt::blue, 3));
+			painter.drawLine(warpImage2Points[0] * scale + newDelta, warpImage2Points[1] * scale + newDelta);
+		}
+		/* draw 2 points second */
+		if (warpImage2Points.size() > 0) {
+			for (int i = 0; i < warpImage2Points.size(); ++i) {
+				painter.setPen(QPen(Qt::red, 5));
+				painter.drawPoint(warpImage2Points[i] * scale + newDelta);
+			}
 		}
 	}
 
@@ -395,73 +508,108 @@ void ShowImage::paintEvent(QPaintEvent *event)
 
 void ShowImage::perspectiveTransform()
 {
-	QVector<QPointF> L ;
-	L << QPointF(0, 0) << QPointF(imgW, 0) << QPointF(imgW, imgH) << QPointF(0, imgH);
+	if (image4PointModified) {
+		QVector<QPointF> L;
+		L << QPointF(0, 0) << QPointF(imgW, 0) << QPointF(imgW, imgH) << QPointF(0, imgH);
 
-	cv::Point2f bPt[4];
-	for (size_t i = 0; i < 4; ++i) {
-		float min = qPow(imgW, 2) + qPow(imgH, 2);
-		int minindex = 0;
-		for (size_t j = 0; j < 4; ++j) {
-			float imin = qPow(rawImage4Points[j].x() - L[i].x(), 2) + qPow(rawImage4Points[j].y() - L[i].y(), 2);
-			if (imin < min) {
-				min = imin;
-				minindex = j;
+		cv::Point2f bPt[4];
+		for (size_t i = 0; i < 4; ++i) {
+			float min = qPow(imgW, 2) + qPow(imgH, 2);
+			int minindex = 0;
+			for (size_t j = 0; j < 4; ++j) {
+				float imin = qPow(rawImage4Points[j].x() - L[i].x(), 2) + qPow(rawImage4Points[j].y() - L[i].y(), 2);
+				if (imin < min) {
+					min = imin;
+					minindex = j;
+				}
 			}
+			bPt[i] = cv::Point2f(rawImage4Points[minindex].x(), rawImage4Points[minindex].y());
 		}
-		bPt[i] = cv::Point2f(rawImage4Points[minindex].x(), rawImage4Points[minindex].y());
-	}
 
-	float W1 = std::sqrt(std::pow(bPt[0].x - bPt[1].x, 2) + std::pow(bPt[0].y - bPt[1].y, 2));
-	float H1 = std::sqrt(std::pow(bPt[1].x - bPt[2].x, 2) + std::pow(bPt[1].y - bPt[2].y, 2));
-	float W2 = std::sqrt(std::pow(bPt[2].x - bPt[3].x, 2) + std::pow(bPt[2].y - bPt[3].y, 2));
-	float H2 = std::sqrt(std::pow(bPt[3].x - bPt[0].x, 2) + std::pow(bPt[3].y - bPt[0].y, 2));
-	float Wp = W1 > W2 ? W1 : W2;
-	float Hp = H1 > H2 ? H1 : H2;
-	float Wr = Hp * float(realSize.x()) / float(realSize.y());
-	float Hr = Wp * float(realSize.y()) / float(realSize.x());
-	
-	float W, H;
-	if (Hr >= Hp) {
-		W = Wp;
-		H = Hr;
-	} else {
-		W = Wr;
-		H = Hp;
-	}
+		float W1 = std::sqrt(std::pow(bPt[0].x - bPt[1].x, 2) + std::pow(bPt[0].y - bPt[1].y, 2));
+		float H1 = std::sqrt(std::pow(bPt[1].x - bPt[2].x, 2) + std::pow(bPt[1].y - bPt[2].y, 2));
+		float W2 = std::sqrt(std::pow(bPt[2].x - bPt[3].x, 2) + std::pow(bPt[2].y - bPt[3].y, 2));
+		float H2 = std::sqrt(std::pow(bPt[3].x - bPt[0].x, 2) + std::pow(bPt[3].y - bPt[0].y, 2));
+		float Wp = W1 > W2 ? W1 : W2;
+		float Hp = H1 > H2 ? H1 : H2;
+		float Wr = Hp * float(realSize.x()) / float(realSize.y());
+		float Hr = Wp * float(realSize.y()) / float(realSize.x());
 
-	warpImage2Points << QPointF(0, 0) << QPointF(W, 0) << QPointF(W, H) << QPointF(0, H) << QPointF(0, 0);
-	cv::Point2f aPt[4] = { cv::Point2f(0, 0), cv::Point2f(W, 0), cv::Point2f(W, H), cv::Point2f(0, H) };
-	cv::Mat rawImg = ShowImage::QImage2Mat(rawImage);
-	cv::Mat perspectiveMatrix = cv::getPerspectiveTransform(bPt, aPt);
-	cv::Mat warpImg;
-	cv::warpPerspective(rawImg, warpImg, perspectiveMatrix, cv::Size(W, H), cv::INTER_CUBIC);
-	warpImage = ShowImage::Mat2QImage(warpImg);
+		float W, H;
+		if (Hr >= Hp) {
+			W = Wp;
+			H = Hr;
+		} else {
+			W = Wr;
+			H = Hp;
+		}
 
-	cv::Matx33f warpMatrix = perspectiveMatrix;
-	for (size_t i = 0; i < rawImage2Points.size(); ++i) {
-		cv::Point3f p(rawImage2Points[i].x(), rawImage2Points[i].y(), 1);
-		p = warpMatrix * p;
-		p = p * (1.0f / p.z);
-		warpImage2Points << QPointF(p.x, p.y);
-	}
-}
+		warpImage4Points << QPointF(0, 0) << QPointF(W, 0) << QPointF(W, H) << QPointF(0, H) << QPointF(0, 0);
+		cv::Point2f aPt[4] = { cv::Point2f(0, 0), cv::Point2f(W, 0), cv::Point2f(W, H), cv::Point2f(0, H) };
+		cv::Mat rawImg = ShowImage::QImage2Mat(rawImage);
+		perspectiveMatrix = cv::getPerspectiveTransform(bPt, aPt);
 
-void ShowImage::getCheckBoxState(int checkBoxState)
-{
-	if (checkBoxState == Qt::Unchecked) {
-		showImage = rawImage;
-		initial();
-	} else {
-		perspectiveTransform();
-		showImage = warpImage;
-		initial();
+		cv::Mat warpImg;
+		cv::warpPerspective(rawImg, warpImg, perspectiveMatrix, cv::Size(W, H), cv::INTER_CUBIC);
+		warpImage = ShowImage::Mat2QImage(warpImg);
 	}
 }
 
 void ShowImage::getRealSize(QPointF size)
 {
 	realSize = size;
+}
+
+void ShowImage::getCheckBoxState(int checkBoxState)
+{
+	if (checkBoxState == Qt::Unchecked) {
+		ShowImage::checkBoxState = Qt::Unchecked;
+
+		showImage = rawImage;
+		if (warpImage2Points.size() < rawImage2Points.size()) {
+			for (size_t i = rawImage2Points.size(); i > warpImage2Points.size(); --i) {
+				rawImage2Points.pop_back();
+			}
+		} else {
+			cv::Matx33f warpMatrix = perspectiveMatrix;
+			for (size_t i = 0; i < warpImage2Points.size(); ++i) {
+				cv::Point3f p(warpImage2Points[i].x(), warpImage2Points[i].y(), 1);
+				p = warpMatrix.inv() * p;
+				p = p * (1.0f / p.z);
+				if (i < rawImage2Points.size()) {
+					rawImage2Points[i] = QPointF(p.x, p.y);
+				} else {
+					rawImage2Points << QPointF(p.x, p.y);
+				}
+			}
+		}
+
+		initial();
+	} else {
+		ShowImage::checkBoxState = Qt::Checked;
+		perspectiveTransform();
+		image4PointModified = 0;
+		showImage = warpImage;
+		if (warpImage2Points.size() > rawImage2Points.size()) {
+			for (size_t i = warpImage2Points.size(); i > rawImage2Points.size(); --i) {
+				warpImage2Points.pop_back();
+			}
+		} else {
+			cv::Matx33f warpMatrix = perspectiveMatrix;
+			for (size_t i = 0; i < rawImage2Points.size(); ++i) {
+				cv::Point3f p(rawImage2Points[i].x(), rawImage2Points[i].y(), 1);
+				p = warpMatrix * p;
+				p = p * (1.0f / p.z);
+				if (i < warpImage2Points.size()) {
+					warpImage2Points[i] = QPointF(p.x, p.y);
+				} else {
+					warpImage2Points << QPointF(p.x, p.y);
+				}
+			}
+		}
+
+		initial();
+	}
 }
 
 QImage ShowImage::Mat2QImage(const cv::Mat& mat)

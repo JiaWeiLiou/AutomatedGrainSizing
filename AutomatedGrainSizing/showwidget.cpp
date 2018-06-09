@@ -66,6 +66,7 @@ ShowWidget::ShowWidget(QWidget *parent)
 	connect(imageWidget, SIGNAL(pointsNumberChanged()), this, SLOT(setWidgetEnable()));
 	connect(heightLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setWidgetEnable()));
 	connect(widthLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setWidgetEnable()));
+	connect(warpCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setLineEditEnable(int)));
 	connect(this, SIGNAL(emitRealSize(QPointF)), imageWidget, SLOT(getRealSize(QPointF)));
 	connect(warpCheckBox, SIGNAL(stateChanged(int)), imageWidget, SLOT(getCheckBoxState(int)));
 }
@@ -85,5 +86,16 @@ void ShowWidget::setWidgetEnable()
 		startPushButton->setEnabled(true);
 	} else {
 		startPushButton->setEnabled(false);
+	}
+}
+
+void ShowWidget::setLineEditEnable(int checkBoxState)
+{
+	if (checkBoxState == Qt::Unchecked) {
+		widthLineEdit->setEnabled(true);
+		heightLineEdit->setEnabled(true);
+	} else {
+		widthLineEdit->setEnabled(false);
+		heightLineEdit->setEnabled(false);
 	}
 }

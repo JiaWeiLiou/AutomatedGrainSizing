@@ -33,4 +33,5 @@ signals:
 
 private slots:
 	void setWidgetEnable();
+	void setLineEditEnable(int checkBoxState);
 };
