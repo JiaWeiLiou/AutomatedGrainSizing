@@ -174,10 +174,10 @@ void WatershedTransform(InputArray _binary, InputArray _seed, InputArray _distan
 //object : object image (8UC1(BW))
 void DeleteEdge(InputArray _binary, OutputArray _object);
 
-//Fitting and Draw Ellipse
+//Fitting Ellipse
 //object : object image(8UC1(BW))
-//ellipse : ellipse image(8UC1(BW))
-//ellipse_param : long and short axis of ellipse
-void DrawEllipse(InputArray _object, OutputArray _ellipseImg, vector<Size2f> &ellipse_param);
+//ellipse_M : short axis of ellipse
+//ellipse_L : long axis of ellipse
+void FitEllipse(InputArray _object, vector<float> &ellipse_M, vector<float> &ellipse_L);
 
-bool AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<Size2f> &ellipse_param);
+bool AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> &ellipse_M, vector<float> &ellipse_L);

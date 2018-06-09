@@ -870,13 +870,9 @@ void DeleteEdge(InputArray _binary, OutputArray _object)
 	}
 }
 
-void DrawEllipse(InputArray _object, OutputArray _ellipseImg, vector<Size2f> &ellipse_param)
+void FitEllipse(InputArray _object, vector<float> &ellipse_M, vector<float> &ellipse_L)
 {
 	Mat object = _object.getMat();
-
-	_ellipseImg.create(object.size(), CV_8UC1);
-	Mat ellipseImg = _ellipseImg.getMat();
-	ellipseImg = Scalar(0);
 
 	Mat labels;
 	int objectNum = bwlabel(object, labels, 4);
@@ -907,17 +903,18 @@ void DrawEllipse(InputArray _object, OutputArray _ellipseImg, vector<Size2f> &el
 	for (size_t i = 0; i < objectNum; ++i) {
 		if (pointset[i].size() > 5) {
 			RotatedRect ellipse_obj = fitEllipse(pointset[i]);
-
-			//draw ellipse
-			ellipse(ellipseImg, ellipse_obj, Scalar(255), 1, CV_AA);
-
-			// store ellipse
-			ellipse_param.push_back(ellipse_obj.size);
+			if (ellipse_obj.size.width < ellipse_obj.size.height) {
+				ellipse_M.push_back(ellipse_obj.size.width);
+				ellipse_L.push_back(ellipse_obj.size.height);
+			} else {
+				ellipse_M.push_back(ellipse_obj.size.height);
+				ellipse_L.push_back(ellipse_obj.size.width);
+			}
 		}
 	}
 }
 
-bool AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<Size2f> &ellipse_param)
+bool AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> &ellipse_M, vector<float> &ellipse_L)
 {
 	/**** Image Pre-Processing ****/
 
@@ -1195,9 +1192,7 @@ bool AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<Size2f>
 	time1 = clock();
 #endif // OUTPUTTIME
 
-	Mat objectFE;		//8UC1(BW)
-	vector<Size2f> ellipse;
-	DrawEllipse(objectDE, objectFE, ellipse);
+	FitEllipse(objectDE, ellipse_M, ellipse_L);
 
 #ifdef OUTPUTTIME
 	time2 = clock();
