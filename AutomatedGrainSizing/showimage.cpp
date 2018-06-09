@@ -380,6 +380,7 @@ void ShowImage::mouseReleaseEvent(QMouseEvent *event)
 		} else {
 			image2PointsFull = warpImage2Points.size() == 2 ? 1 : 0;
 		}
+		if (image2PointsFull) { emit pointsNumberChanged(); }
 	}
 	update();
 }

@@ -82,7 +82,7 @@ void ShowWidget::setWidgetEnable()
 		warpCheckBox->setEnabled(false);
 	}
 
-	if (imageWidget->rawImage2Points.size() == 2 && Wvalue > 0 && Hvalue > 0) {
+	if (imageWidget->image2PointsFull && Wvalue > 0 && Hvalue > 0) {
 		startPushButton->setEnabled(true);
 	} else {
 		startPushButton->setEnabled(false);
@@ -92,10 +92,18 @@ void ShowWidget::setWidgetEnable()
 void ShowWidget::setLineEditEnable(int checkBoxState)
 {
 	if (checkBoxState == Qt::Unchecked) {
+		widthLabel->setEnabled(true);
 		widthLineEdit->setEnabled(true);
+		wUintLabel->setEnabled(true);
+		heightLabel->setEnabled(true);
 		heightLineEdit->setEnabled(true);
+		hUintLabel->setEnabled(true);
 	} else {
+		widthLabel->setEnabled(false);
 		widthLineEdit->setEnabled(false);
+		wUintLabel->setEnabled(false);
+		heightLabel->setEnabled(false);
 		heightLineEdit->setEnabled(false);
+		hUintLabel->setEnabled(false);
 	}
 }

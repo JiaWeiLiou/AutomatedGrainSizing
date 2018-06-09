@@ -41,6 +41,8 @@ public:
 	QVector<QPointF> rawImage2Points;				// record 2  raw image points' pixel
 	QVector<QPointF> warpImage4Points;				// record 4 warp image points' pixel
 	QVector<QPointF> warpImage2Points;				// record 2 warp image points' pixel
+	bool image4PointsFull = 0;							// image 4 points full
+	bool image2PointsFull = 0;							// image 2 points full
 	bool loading = false;							// loading file
 	QImage showImage;								// image to show
 	QImage rawImage;								// store raw image
@@ -65,8 +67,6 @@ private:
 	QPointF oldDelta;									// old displacement
 	QPointF pos1;										// mouse press position 1
 	QPointF pos2;										// mouse press position 2
-	bool image4PointsFull = 0;							// image 4 points full
-	bool image2PointsFull = 0;							// image 2 points full
 	bool outBorder = 0;									// record point is out of border or not
 	int modifiedPointState;								// record modify of points (0 to 6, 0 is not modified)
 	QPointF realSize;									// record lineEdit size
