@@ -6,47 +6,63 @@
 ShowWidget::ShowWidget(QWidget *parent)
 	: QWidget(parent)
 {
+	// set imageWidget
 	imageWidget = new ShowImage;
 	imageWidget->setFocusPolicy(Qt::ClickFocus);
 	imageWidget->setMinimumSize(600, 400);
 	imageWidget->setStyleSheet("border: 1px solid lightgray;");
+
+	// set warpCheckBox
 	warpCheckBox = new QCheckBox("Perspective Projection Transform");
 	warpCheckBox->setEnabled(false);
+
+	// set RegExp
 	QRegExp rx("^[0-9]*[1-9][0-9]*$");
 	QValidator *validator = new QRegExpValidator(rx, this);
+
+	// set widthLabel and widthLineEdit and wUintLabel
 	widthLabel = new QLabel("Width");
 	widthLineEdit = new QLineEdit("1000");
 	widthLineEdit->setValidator(validator);
 	widthLineEdit->setFixedWidth(50);
 	widthLineEdit->setAlignment(Qt::AlignRight);
-	wuintLabel = new QLabel("(mm)");
+	wUintLabel = new QLabel("(mm)");
+
+	// set heightLabel and heightLineEdit and hUintLabel
 	heightLabel = new QLabel("Height");
 	heightLineEdit = new QLineEdit("1000");
 	heightLineEdit->setValidator(validator);
 	heightLineEdit->setFixedWidth(50);
 	heightLineEdit->setAlignment(Qt::AlignRight);
-	huintLabel = new QLabel("(mm)");
+	hUintLabel = new QLabel("(mm)");
+
+	// set startPuchButton
 	startPushButton = new QPushButton("Start");
 	startPushButton->setMinimumWidth(100);
 	startPushButton->setEnabled(false);
+
+	// set hLayout
 	QHBoxLayout *hLayout = new QHBoxLayout;
 	hLayout->addWidget(warpCheckBox);
 	hLayout->addSpacing(20);
 	hLayout->addStretch(5);
 	hLayout->addWidget(heightLabel);
 	hLayout->addWidget(heightLineEdit);
-	hLayout->addWidget(huintLabel);
+	hLayout->addWidget(hUintLabel);
 	hLayout->addSpacing(10);
 	hLayout->addWidget(widthLabel);
 	hLayout->addWidget(widthLineEdit);
-	hLayout->addWidget(wuintLabel);
+	hLayout->addWidget(wUintLabel);
 	hLayout->addSpacing(20);
 	hLayout->addStretch(1);
 	hLayout->addWidget(startPushButton);
+
+	// set mainLayout
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
 	mainLayout->addWidget(imageWidget);
 	mainLayout->addLayout(hLayout);
 
+	//set signal and slot connect
 	connect(imageWidget, SIGNAL(pointsNumberChanged()), this, SLOT(setWidgetEnable()));
 	connect(heightLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setWidgetEnable()));
 	connect(widthLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setWidgetEnable()));

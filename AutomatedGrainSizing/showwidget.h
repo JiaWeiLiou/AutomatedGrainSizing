@@ -17,16 +17,15 @@ class ShowWidget : public QWidget
 	Q_OBJECT
 public:
 	ShowWidget(QWidget *parent = Q_NULLPTR);
-	ShowImage *imageWidget;
 
-private:
+	ShowImage *imageWidget;
 	QCheckBox *warpCheckBox;
 	QLabel *widthLabel;
 	QLineEdit *widthLineEdit;
-	QLabel *wuintLabel;
+	QLabel *wUintLabel;
 	QLabel *heightLabel;
 	QLineEdit *heightLineEdit;
-	QLabel *huintLabel;
+	QLabel *hUintLabel;
 	QPushButton *startPushButton;
 
 signals:
