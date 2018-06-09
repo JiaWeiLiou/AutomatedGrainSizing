@@ -112,6 +112,7 @@
     </QtRcc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="automatedgrainsizing.cpp" />
     <ClCompile Include="showimage.cpp" />
     <ClCompile Include="showmainwindow.cpp" />
     <ClCompile Include="main.cpp" />
@@ -128,6 +129,9 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="showimage.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="automatedgrainsizing.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

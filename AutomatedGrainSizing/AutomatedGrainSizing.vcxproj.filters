@@ -42,6 +42,9 @@
     <ClCompile Include="showimage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="automatedgrainsizing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="showwidget.h">
@@ -58,5 +61,10 @@
     <QtRcc Include="AutomatedGrainSizing.qrc">
       <Filter>Resource Files</Filter>
     </QtRcc>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="automatedgrainsizing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
