@@ -46,7 +46,7 @@ void ShowImage::initial()
 		scale = minScale;
 	}
 
-	repaint();
+	update();
 }
 
 void ShowImage::clearPoints()
@@ -64,7 +64,6 @@ void ShowImage::clearPoints()
 		image2PointsFull = 0;
 		emit pointsNumberChanged();
 	}
-
 }
 
 void ShowImage::resizeEvent(QResizeEvent *event)
@@ -89,7 +88,7 @@ void ShowImage::resizeEvent(QResizeEvent *event)
 		minScale = scaleW < scaleH ? scaleW : scaleH;
 		scale = scale < minScale ? minScale : scale;
 	}
-	repaint();
+	update();
 }
 
 void ShowImage::wheelEvent(QWheelEvent *event)

@@ -35,6 +35,9 @@ void ShowMainWindow::dropEvent(QDropEvent *event)
 	}
 
 	setWindowTitle(fileName + QString(" - Automated Grain Sizing"));		// set windows title
+
+	showWidget->warpCheckBox->setCheckState(Qt::Unchecked);					// set unclick
+
 	showWidget->imageWidget->loadImage(filePathName);						// store image
 }
 
