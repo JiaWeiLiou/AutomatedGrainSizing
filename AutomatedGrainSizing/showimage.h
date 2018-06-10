@@ -81,6 +81,7 @@ private:
 	int modifiedPointState;								// record modify of points (0 to 6, 0 is not modified)
 	int checkBoxState = 0;								// record checkBox state
 	bool image4PointModified = 1;						// record 4 points modified(0 - not mod, 1 - mod)
+	bool startPushed = 0;								// record startPushButton pushed or not
 	QPointF realSize;									// record lineEdit size
 	int mumax;											// record grain's max grain size
 	void raw2WarpImagePoints();							// raw image points to warp image points
@@ -94,5 +95,5 @@ signals:
 private slots:
 	void getRealSize(QPointF size);						// get lineEdit size
 	void getCheckBoxState(int checkBoxState);			// get checkbox state
-	void automatedGrainSizing();						// automated grained sizing
+	void startProcessing();						// automated grained sizing
 };

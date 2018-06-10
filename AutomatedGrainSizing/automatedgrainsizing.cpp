@@ -1,9 +1,17 @@
 #include "automatedgrainsizing.h"
 
 AutomatedGrainSizing::AutomatedGrainSizing(QWidget *parent)
-	: AutomatedGrainSizing(parent)
+	: QDialog(parent)
 {
-
+	progressDialog = new QProgressDialog(this, Qt::WindowSystemMenuHint | Qt::WindowTitleHint);
+	progressDialog->setWindowModality(Qt::ApplicationModal);
+	progressDialog->setMinimumDuration(0);
+	progressDialog->setAttribute(Qt::WA_DeleteOnClose, true);
+	progressDialog->setWindowTitle("Please Wait");
+	progressDialog->setLabelText("Running...");
+	progressDialog->setCancelButtonText("Cancel");
+	progressDialog->setRange(0, 18);
+	progressDialog->setValue(1);
 }
 
 int AutomatedGrainSizing::findroot(int labeltable[], int label)
@@ -979,12 +987,11 @@ void AutomatedGrainSizing::FitEllipse(InputArray _object, vector<float> &ellipse
 
 void AutomatedGrainSizing::DoAutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> &ellipse_M, vector<float> &ellipse_L)
 {
-
 	Mat gray;
 	RGBToGray(image, gray);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(1);
+	progressDialog->setValue(2);
 
 	size_t ksize = round(mumax * 5);
 	ksize = ksize % 2 ? ksize : ksize + 1;
@@ -994,108 +1001,95 @@ void AutomatedGrainSizing::DoAutomatedGrainSizing(Mat image, Point2i realSize, i
 	GaussianBlurF(gray, grayBlur, sigma, 5);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(2);
+	progressDialog->setValue(3);
 
 	Mat grayDIV;
 	DivideArea(gray, grayBlur, grayDIV);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(3);
+	progressDialog->setValue(4);
 
 	Mat grayTH;
 	KittlerThresholdArea(grayDIV, grayTH);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(4);
+	progressDialog->setValue(5);
 
 	Mat gradm;
 	Gradient(gray, gradm);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(5);
+	progressDialog->setValue(6);
 
 	Mat gradmBlur;
 	blur(gradm, gradmBlur, Size(5, 5));
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(6);
+	progressDialog->setValue(7);
 
 	Mat gradmDB;
 	DivideLineBinary(gradm, gradmBlur, gradmDB);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(7);
+	progressDialog->setValue(8);
 
 	Mat lineHC;
 	HysteresisCut(gradmDB, grayTH, lineHC);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(8);
+	progressDialog->setValue(9);
 
 	Mat objectCOM;
 	Combine(grayTH, lineHC, objectCOM);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(9);
+	progressDialog->setValue(10);
 
 	Mat objectOpen;
 	Mat elementO = (Mat_<uchar>(5, 5) << 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0); // circle
 	cv::morphologyEx(objectCOM, objectOpen, MORPH_OPEN, elementO);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(10);
+	progressDialog->setValue(11);
 
 	Mat objectCN;
 	ClearNoise(objectOpen, objectCN, mumax);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(11);
+	progressDialog->setValue(12);
 
 	Mat objectDT;
 	cv::distanceTransform(objectCN, objectDT, CV_DIST_L2, 3);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(12);
+	progressDialog->setValue(13);
 
 	Mat objectEM;
 	ExtendRegionalMinima(objectDT, objectEM, 5);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(13);
+	progressDialog->setValue(14);
 
 	Mat objectAS;
 	AddSeed(objectCN, objectEM, objectAS);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(14);
+	progressDialog->setValue(15);
 
 	Mat objectWT;
 	WatershedTransform(objectCN, objectAS, objectDT, objectWT);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(15);
+	progressDialog->setValue(16);
 
 	Mat objectDE;
 	DeleteEdge(objectWT, objectDE);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(16);
+	progressDialog->setValue(17);
 
 	FitEllipse(objectDE, ellipse_M, ellipse_L);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(17);
-}
-
-void AutomatedGrainSizing::startProgress()
-{
-	progressDialog = new QProgressDialog(this);
-	progressDialog->setWindowModality(Qt::WindowModal);
-	progressDialog->setWindowTitle("Please Wait");
-	progressDialog->setLabelText("Running...");
-	progressDialog->setCancelButtonText("Cancel");
-	progressDialog->setRange(0, 17);
-
-	DoAutomatedGrainSizing(image, realSize, mumax, ellipse_M, ellipse_L);
-
+	progressDialog->setValue(18);
 }

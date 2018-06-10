@@ -7,7 +7,6 @@
 #include <limits>
 #include <QtWidgets/QDialog>
 #include <QProgressDialog>
-#include <QGridLayout>
 
 using namespace std;
 using namespace cv;
@@ -26,14 +25,10 @@ using namespace cv;
 class AutomatedGrainSizing : public QDialog
 {
 	Q_OBJECT
-public:
-	AutomatedGrainSizing(QWidget *parent = 0);
 
-	Mat image;
-	Point2i realSize;
-	int mumax; 
-	vector<float> ellipse_M; 
-	vector<float> ellipse_L;
+public:
+	AutomatedGrainSizing(QWidget *parent = Q_NULLPTR);
+	QProgressDialog *progressDialog;
 
 	//Find Root
 	int findroot(int labeltable[], int label);
@@ -113,9 +108,6 @@ public:
 	void DeleteEdge(InputArray _binary, OutputArray _object);
 	//Fitting Ellipse
 	void FitEllipse(InputArray _object, vector<float> &ellipse_M, vector<float> &ellipse_L);
-	void DoAutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> &ellipse_M, vector<float> &ellipse_L);
-	void startProgress();
 
-private:
-	QProgressDialog *progressDialog;
+	void DoAutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> &ellipse_M, vector<float> &ellipse_L);
 };

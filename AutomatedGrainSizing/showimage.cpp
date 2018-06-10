@@ -572,6 +572,9 @@ void ShowImage::warp2RawImagePoints()
 void ShowImage::perspectiveTransform()
 {
 	if (image4PointModified) {
+
+		image4PointModified = 0;
+
 		QVector<QPointF> L;
 		L << QPointF(0, 0) << QPointF(imgW, 0) << QPointF(imgW, imgH) << QPointF(0, imgH);
 
@@ -619,20 +622,15 @@ void ShowImage::perspectiveTransform()
 		cv::Mat warpImg;
 		cv::warpPerspective(rawImg, warpImg, perspectiveMatrix, cv::Size(W, H), cv::INTER_CUBIC);
 		warpImage = ShowImage::Mat2QImage(warpImg);
-		image4PointModified = 0;
 	}
 }
 
-void ShowImage::automatedGrainSizing()
+void ShowImage::startProcessing()
 {
+	progressBar = new AutomatedGrainSizing;
 	perspectiveTransform();
 	cv::Mat img = QImage2Mat(warpImage);
-	progressBar->image = img;
-	progressBar->realSize = cv::Point2i(realSize.x(), realSize.y());
-	progressBar->mumax = getMuMax();
-	progressBar->startProgress();
-	ellipseM = progressBar->ellipse_M;
-	ellipseL = progressBar->ellipse_L;
+	progressBar->DoAutomatedGrainSizing(img, cv::Point2i(realSize.x(), realSize.y()), getMuMax(), ellipseM, ellipseL);
 }
 
 void ShowImage::getRealSize(QPointF size)
