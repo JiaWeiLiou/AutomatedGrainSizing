@@ -10,8 +10,6 @@ AutomatedGrainSizing::AutomatedGrainSizing(QWidget *parent)
 	progressDialog->setWindowTitle("Please Wait");
 	progressDialog->setLabelText("Running...");
 	progressDialog->setCancelButtonText("Cancel");
-	progressDialog->setRange(0, 18);
-	progressDialog->setValue(1);
 }
 
 int AutomatedGrainSizing::findroot(int labeltable[], int label)
@@ -232,19 +230,19 @@ void AutomatedGrainSizing::boxBlurM(InputArray _gray, OutputArray _blur, size_t 
 	}
 }
 
-void AutomatedGrainSizing::GaussianBlurF(InputArray _gray, OutputArray _blur, const double sigma, size_t n)
+void AutomatedGrainSizing::GaussianBlurF(InputArray _gray, OutputArray _blur, const double sigma, int n)
 {
 	Mat gray = _gray.getMat();
 	_blur.create(gray.size(), CV_8UC1);
 	Mat blur = _blur.getMat();
 
 	float wIdeal = sqrt((12 * sigma*sigma / n) + 1);  // Ideal averaging filter width 
-	size_t wl = floor(wIdeal);
+	int wl = floor(wIdeal);
 	if (wl % 2 == 0) --wl;
-	size_t wu = wl + 2;
+	int wu = wl + 2;
 
 	float mIdeal = (12 * sigma*sigma - n*wl*wl - 4 * n*wl - 3 * n) / (-4 * wl - 4);
-	size_t m = round(mIdeal);
+	int m = round(mIdeal);
 	// var sigmaActual = Math.sqrt( (m*wl*wl + (n-m)*wu*wu - n)/12 );
 
 	Mat grayblur(gray.size(), CV_8UC1);
@@ -254,6 +252,9 @@ void AutomatedGrainSizing::GaussianBlurF(InputArray _gray, OutputArray _blur, co
 		size_t size = i < m ? wl : wu;
 		boxBlurM(grayblur, blur, (size - 1) / 2);
 		blur.copyTo(grayblur);
+
+		if (progressDialog->wasCanceled()) return;
+		progressDialog->setValue(++num);
 	}
 }
 
@@ -987,109 +988,121 @@ void AutomatedGrainSizing::FitEllipse(InputArray _object, vector<float> &ellipse
 
 void AutomatedGrainSizing::DoAutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> &ellipse_M, vector<float> &ellipse_L)
 {
+	int n = 5;
+	int ksize = round(mumax * 5);
+	ksize = ksize % 2 ? ksize : ksize + 1;
+	double sigma = ksize / 6.07;
+
+	float wIdeal = sqrt((12 * sigma*sigma / n) + 1);  // Ideal averaging filter width 
+	int wl = floor(wIdeal);
+	if (wl % 2 == 0) --wl;
+	float mIdeal = (12 * sigma*sigma - n*wl*wl - 4 * n*wl - 3 * n) / (-4 * wl - 4);
+	int m = round(mIdeal);
+
+	progressDialog->setRange(0, 18 + (n + m));
+
+	if (progressDialog->wasCanceled()) return;
+	progressDialog->setValue(++num);
+
 	Mat gray;
 	RGBToGray(image, gray);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(2);
-
-	size_t ksize = round(mumax * 5);
-	ksize = ksize % 2 ? ksize : ksize + 1;
-	double sigma = ksize / 6.07;
+	progressDialog->setValue(++num);
 
 	Mat grayBlur;
-	GaussianBlurF(gray, grayBlur, sigma, 5);
+	GaussianBlurF(gray, grayBlur, sigma, n);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(3);
+	progressDialog->setValue(++num);
 
 	Mat grayDIV;
 	DivideArea(gray, grayBlur, grayDIV);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(4);
+	progressDialog->setValue(++num);
 
 	Mat grayTH;
 	KittlerThresholdArea(grayDIV, grayTH);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(5);
+	progressDialog->setValue(++num);
 
 	Mat gradm;
 	Gradient(gray, gradm);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(6);
+	progressDialog->setValue(++num);
 
 	Mat gradmBlur;
 	blur(gradm, gradmBlur, Size(5, 5));
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(7);
+	progressDialog->setValue(++num);
 
 	Mat gradmDB;
 	DivideLineBinary(gradm, gradmBlur, gradmDB);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(8);
+	progressDialog->setValue(++num);
 
 	Mat lineHC;
 	HysteresisCut(gradmDB, grayTH, lineHC);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(9);
+	progressDialog->setValue(++num);
 
 	Mat objectCOM;
 	Combine(grayTH, lineHC, objectCOM);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(10);
+	progressDialog->setValue(++num);
 
 	Mat objectOpen;
 	Mat elementO = (Mat_<uchar>(5, 5) << 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0); // circle
 	cv::morphologyEx(objectCOM, objectOpen, MORPH_OPEN, elementO);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(11);
+	progressDialog->setValue(++num);
 
 	Mat objectCN;
 	ClearNoise(objectOpen, objectCN, mumax);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(12);
+	progressDialog->setValue(++num);
 
 	Mat objectDT;
 	cv::distanceTransform(objectCN, objectDT, CV_DIST_L2, 3);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(13);
+	progressDialog->setValue(++num);
 
 	Mat objectEM;
 	ExtendRegionalMinima(objectDT, objectEM, 5);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(14);
+	progressDialog->setValue(++num);
 
 	Mat objectAS;
 	AddSeed(objectCN, objectEM, objectAS);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(15);
+	progressDialog->setValue(++num);
 
 	Mat objectWT;
 	WatershedTransform(objectCN, objectAS, objectDT, objectWT);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(16);
+	progressDialog->setValue(++num);
 
 	Mat objectDE;
 	DeleteEdge(objectWT, objectDE);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(17);
+	progressDialog->setValue(++num);
 
 	FitEllipse(objectDE, ellipse_M, ellipse_L);
 
 	if (progressDialog->wasCanceled()) return;
-	progressDialog->setValue(18);
+	progressDialog->setValue(++num);
 }
