@@ -56,15 +56,13 @@
     <QtMoc Include="showimage.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="automatedgrainsizing.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="AutomatedGrainSizing.qrc">
       <Filter>Resource Files</Filter>
     </QtRcc>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="automatedgrainsizing.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,6 +1,12 @@
 #include "automatedgrainsizing.h"
 
-int findroot(int labeltable[], int label)
+AutomatedGrainSizing::AutomatedGrainSizing(QWidget *parent)
+	: AutomatedGrainSizing(parent)
+{
+
+}
+
+int AutomatedGrainSizing::findroot(int labeltable[], int label)
 {
 	int x = label;
 	while (x != labeltable[x]) {
@@ -9,7 +15,7 @@ int findroot(int labeltable[], int label)
 	return x;
 }
 
-int bwlabel(InputArray _binary, OutputArray _labelImg, int nears)
+int AutomatedGrainSizing::bwlabel(InputArray _binary, OutputArray _labelImg, int nears)
 {
 	Mat binary = _binary.getMat();
 	CV_Assert(binary.type() == CV_8UC1);
@@ -151,7 +157,7 @@ int bwlabel(InputArray _binary, OutputArray _labelImg, int nears)
 	return nobj;
 }
 
-void RGBToGray(InputArray _image, OutputArray _gray)
+void AutomatedGrainSizing::RGBToGray(InputArray _image, OutputArray _gray)
 {
 	Mat image = _image.getMat();
 	_gray.create(image.size(), CV_8UC1);
@@ -168,7 +174,7 @@ void RGBToGray(InputArray _image, OutputArray _gray)
 	}
 }
 
-void boxBlurM(InputArray _gray, OutputArray _blur, size_t r)
+void AutomatedGrainSizing::boxBlurM(InputArray _gray, OutputArray _blur, size_t r)
 {
 	Mat gray = _gray.getMat();
 	_blur.create(gray.size(), CV_8UC1);
@@ -218,7 +224,7 @@ void boxBlurM(InputArray _gray, OutputArray _blur, size_t r)
 	}
 }
 
-void GaussianBlurF(InputArray _gray, OutputArray _blur, const double sigma, size_t n)
+void AutomatedGrainSizing::GaussianBlurF(InputArray _gray, OutputArray _blur, const double sigma, size_t n)
 {
 	Mat gray = _gray.getMat();
 	_blur.create(gray.size(), CV_8UC1);
@@ -243,7 +249,7 @@ void GaussianBlurF(InputArray _gray, OutputArray _blur, const double sigma, size
 	}
 }
 
-void DivideArea(InputArray _gray, InputArray _blur, OutputArray _divide)
+void AutomatedGrainSizing::DivideArea(InputArray _gray, InputArray _blur, OutputArray _divide)
 {
 	Mat gray = _gray.getMat();
 
@@ -266,7 +272,7 @@ void DivideArea(InputArray _gray, InputArray _blur, OutputArray _divide)
 	}
 }
 
-void KittlerThresholdArea(InputArray _gray, OutputArray _binary)
+void AutomatedGrainSizing::KittlerThresholdArea(InputArray _gray, OutputArray _binary)
 {
 	Mat gray = _gray.getMat();
 
@@ -363,7 +369,7 @@ void KittlerThresholdArea(InputArray _gray, OutputArray _binary)
 	cv::threshold(gray, binary, th, 255, THRESH_BINARY);
 }
 
-void Gradient(InputArray _gray, OutputArray _gradient)
+void AutomatedGrainSizing::Gradient(InputArray _gray, OutputArray _gradient)
 {
 	Mat gray = _gray.getMat();
 
@@ -383,7 +389,7 @@ void Gradient(InputArray _gray, OutputArray _gradient)
 	}
 }
 
-void DivideLineBinary(InputArray _gradient, InputArray _blur, OutputArray _divide)
+void AutomatedGrainSizing::DivideLineBinary(InputArray _gradient, InputArray _blur, OutputArray _divide)
 {
 	Mat gradient = _gradient.getMat();
 
@@ -403,7 +409,7 @@ void DivideLineBinary(InputArray _gradient, InputArray _blur, OutputArray _divid
 	}
 }
 
-void HysteresisCut(InputArray _binary, InputArray _area, OutputArray _line)
+void AutomatedGrainSizing::HysteresisCut(InputArray _binary, InputArray _area, OutputArray _line)
 {
 	Mat binary = _binary.getMat();
 
@@ -473,7 +479,7 @@ void HysteresisCut(InputArray _binary, InputArray _area, OutputArray _line)
 	delete[] labeltable;
 }
 
-void Combine(InputArray _area, InputArray _line, OutputArray _binary)
+void AutomatedGrainSizing::Combine(InputArray _area, InputArray _line, OutputArray _binary)
 {
 	Mat area = _area.getMat();
 
@@ -493,7 +499,7 @@ void Combine(InputArray _area, InputArray _line, OutputArray _binary)
 	}
 }
 
-void ClearNoise(InputArray _binary, OutputArray _clear, float mumax)
+void AutomatedGrainSizing::ClearNoise(InputArray _binary, OutputArray _clear, float mumax)
 {
 	Mat binary = _binary.getMat();
 
@@ -544,7 +550,7 @@ void ClearNoise(InputArray _binary, OutputArray _clear, float mumax)
 	delete[] labeltable;
 }
 
-void Reconstruct(InputArray _marker, InputArray _mask, OutputArray _hdistance)
+void AutomatedGrainSizing::Reconstruct(InputArray _marker, InputArray _mask, OutputArray _hdistance)
 {
 	Mat marker = _marker.getMat();
 
@@ -628,7 +634,7 @@ void Reconstruct(InputArray _marker, InputArray _mask, OutputArray _hdistance)
 	}
 }
 
-void HMinimaTransform(InputArray _distance, OutputArray _hdistance, float h)
+void AutomatedGrainSizing::HMinimaTransform(InputArray _distance, OutputArray _hdistance, float h)
 {
 	Mat distance = _distance.getMat();
 
@@ -645,7 +651,7 @@ void HMinimaTransform(InputArray _distance, OutputArray _hdistance, float h)
 	Reconstruct(marker, distance, hdistance);
 }
 
-void DetectRegionalMinima(InputArray _distance, OutputArray _seed)
+void AutomatedGrainSizing::DetectRegionalMinima(InputArray _distance, OutputArray _seed)
 {
 	Mat distance = _distance.getMat();
 
@@ -695,7 +701,7 @@ void DetectRegionalMinima(InputArray _distance, OutputArray _seed)
 	}
 }
 
-void ExtendRegionalMinima(InputArray _distance, OutputArray _seed, float h)
+void AutomatedGrainSizing::ExtendRegionalMinima(InputArray _distance, OutputArray _seed, float h)
 {
 	Mat distance = _distance.getMat();
 
@@ -722,7 +728,7 @@ void ExtendRegionalMinima(InputArray _distance, OutputArray _seed, float h)
 	DetectRegionalMinima(objectHMT, seed);
 }
 
-void DistanceCut(InputArray _distance, OutputArray _seed)
+void AutomatedGrainSizing::DistanceCut(InputArray _distance, OutputArray _seed)
 {
 	Mat distance = _distance.getMat();
 
@@ -738,7 +744,7 @@ void DistanceCut(InputArray _distance, OutputArray _seed)
 	}
 }
 
-void AddSeed(InputArray _binary, InputArray _seed, OutputArray _fseed)
+void AutomatedGrainSizing::AddSeed(InputArray _binary, InputArray _seed, OutputArray _fseed)
 {
 	Mat binary = _binary.getMat();
 
@@ -775,7 +781,7 @@ void AddSeed(InputArray _binary, InputArray _seed, OutputArray _fseed)
 	labeltable = nullptr;
 }
 
-void DetectMinima(InputArray _distance, InputArray _seed, OutputArray _labelImg, priority_queue<PixelElement, vector<PixelElement>, mycomparison> &sortedQueue)
+void AutomatedGrainSizing::DetectMinima(InputArray _distance, InputArray _seed, OutputArray _labelImg, priority_queue<PixelElement, vector<PixelElement>, mycomparison> &sortedQueue)
 {
 	Mat distance = _distance.getMat();
 
@@ -802,7 +808,7 @@ void DetectMinima(InputArray _distance, InputArray _seed, OutputArray _labelImg,
 	}
 }
 
-bool CheckForAlreadyLabeledNeighbours(int x, int y, Mat &label, Point2i &outLabeledNeighbour, int &outLabel)
+bool AutomatedGrainSizing::CheckForAlreadyLabeledNeighbours(int x, int y, Mat &label, Point2i &outLabeledNeighbour, int &outLabel)
 {
 	for (int dy = -1; dy <= 1; dy++) {
 		for (int dx = -1; dx <= 1; dx++) {
@@ -818,7 +824,7 @@ bool CheckForAlreadyLabeledNeighbours(int x, int y, Mat &label, Point2i &outLabe
 	return false;
 }
 
-bool CheckIfPixelIsWatershed(int x, int y, Mat &label, Point2i &inLabeledNeighbour)
+bool AutomatedGrainSizing::CheckIfPixelIsWatershed(int x, int y, Mat &label, Point2i &inLabeledNeighbour)
 {
 	for (int dy = -1; dy <= 1; dy++) {
 		for (int dx = -1; dx <= 1; dx++) {
@@ -833,7 +839,7 @@ bool CheckIfPixelIsWatershed(int x, int y, Mat &label, Point2i &inLabeledNeighbo
 	return false;
 }
 
-void WatershedTransform(InputArray _binary, InputArray _seed, InputArray _distance, OutputArray _object)
+void AutomatedGrainSizing::WatershedTransform(InputArray _binary, InputArray _seed, InputArray _distance, OutputArray _object)
 {
 	Mat binary = _binary.getMat();
 
@@ -898,7 +904,7 @@ void WatershedTransform(InputArray _binary, InputArray _seed, InputArray _distan
 	}
 }
 
-void DeleteEdge(InputArray _binary, OutputArray _object)
+void AutomatedGrainSizing::DeleteEdge(InputArray _binary, OutputArray _object)
 {
 	Mat binary = _binary.getMat();
 
@@ -924,7 +930,7 @@ void DeleteEdge(InputArray _binary, OutputArray _object)
 	}
 }
 
-void FitEllipse(InputArray _object, vector<float> &ellipse_M, vector<float> &ellipse_L)
+void AutomatedGrainSizing::FitEllipse(InputArray _object, vector<float> &ellipse_M, vector<float> &ellipse_L)
 {
 	Mat object = _object.getMat();
 
@@ -966,135 +972,130 @@ void FitEllipse(InputArray _object, vector<float> &ellipse_M, vector<float> &ell
 			}
 		}
 	}
+
+	std::sort(ellipse_M.begin(), ellipse_M.end());
+	std::sort(ellipse_L.begin(), ellipse_L.end());
 }
 
-void AutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> &ellipse_M, vector<float> &ellipse_L)
+void AutomatedGrainSizing::DoAutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> &ellipse_M, vector<float> &ellipse_L)
 {
 
-	Mat gray;			//8UC1
+	Mat gray;
 	RGBToGray(image, gray);
 
-#ifdef OUTPUTTIME
-	time2 = clock();
-#endif // OUTPUTTIME
+	if (progressDialog->wasCanceled()) return;
+	progressDialog->setValue(1);
 
 	size_t ksize = round(mumax * 5);
 	ksize = ksize % 2 ? ksize : ksize + 1;
 	double sigma = ksize / 6.07;
 
-	Mat grayBlur;			//8UC1
+	Mat grayBlur;
 	GaussianBlurF(gray, grayBlur, sigma, 5);
 
-#ifdef OUTPUTTIME
-	time2 = clock();
-#endif // OUTPUTTIME
+	if (progressDialog->wasCanceled()) return;
+	progressDialog->setValue(2);
 
-	Mat grayDIV;			//8UC1
+	Mat grayDIV;
 	DivideArea(gray, grayBlur, grayDIV);
 
-#ifdef OUTPUTTIME
-	time2 = clock();
-#endif // OUTPUTTIME
+	if (progressDialog->wasCanceled()) return;
+	progressDialog->setValue(3);
 
-	Mat grayTH;			//8UC1(BW)
+	Mat grayTH;
 	KittlerThresholdArea(grayDIV, grayTH);
 
-#ifdef OUTPUTTIME
-	time2 = clock();
-#endif // OUTPUTTIME
+	if (progressDialog->wasCanceled()) return;
+	progressDialog->setValue(4);
 
-	Mat gradm;			//8UC1
+	Mat gradm;
 	Gradient(gray, gradm);
 
-#ifdef OUTPUTTIME
-	time2 = clock();
-#endif // OUTPUTTIME
+	if (progressDialog->wasCanceled()) return;
+	progressDialog->setValue(5);
 
-	Mat gradmBlur;			//8UC1
+	Mat gradmBlur;
 	blur(gradm, gradmBlur, Size(5, 5));
 
-#ifdef OUTPUTTIME
-	time2 = clock();
-#endif // OUTPUTTIME
+	if (progressDialog->wasCanceled()) return;
+	progressDialog->setValue(6);
 
-	Mat gradmDB;			//8UC1
+	Mat gradmDB;
 	DivideLineBinary(gradm, gradmBlur, gradmDB);
 
-#ifdef OUTPUTTIME
-	time2 = clock();
-#endif // OUTPUTTIME
+	if (progressDialog->wasCanceled()) return;
+	progressDialog->setValue(7);
 
-	Mat lineHC;			//8UC1(BW)
+	Mat lineHC;
 	HysteresisCut(gradmDB, grayTH, lineHC);
 
-#ifdef OUTPUTTIME
-	time2 = clock();
-#endif // OUTPUTTIME
+	if (progressDialog->wasCanceled()) return;
+	progressDialog->setValue(8);
 
-#ifdef OUTPUTTIME
-	time2 = clock();
-#endif // OUTPUTTIME
-
-	Mat objectCOM;			//8UC1(BW)
+	Mat objectCOM;
 	Combine(grayTH, lineHC, objectCOM);
 
-#ifdef OUTPUTTIME
-	time2 = clock();
-#endif // OUTPUTTIME
+	if (progressDialog->wasCanceled()) return;
+	progressDialog->setValue(9);
 
-	Mat objectOpen;			//8UC1(BW)
+	Mat objectOpen;
 	Mat elementO = (Mat_<uchar>(5, 5) << 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0); // circle
 	cv::morphologyEx(objectCOM, objectOpen, MORPH_OPEN, elementO);
 
-#ifdef OUTPUTTIME
-	time2 = clock();
-#endif // OUTPUTTIME
+	if (progressDialog->wasCanceled()) return;
+	progressDialog->setValue(10);
 
-	Mat objectCN;			//8UC1(BW)
+	Mat objectCN;
 	ClearNoise(objectOpen, objectCN, mumax);
 
-#ifdef OUTPUTTIME
-	time2 = clock();
-#endif // OUTPUTTIME
+	if (progressDialog->wasCanceled()) return;
+	progressDialog->setValue(11);
 
-	Mat objectDT;		//32FC1
+	Mat objectDT;
 	cv::distanceTransform(objectCN, objectDT, CV_DIST_L2, 3);
 
-#ifdef OUTPUTTIME
-	time2 = clock();
-#endif // OUTPUTTIME
+	if (progressDialog->wasCanceled()) return;
+	progressDialog->setValue(12);
 
-	Mat objectEM;		//8UC1(BW)
+	Mat objectEM;
 	ExtendRegionalMinima(objectDT, objectEM, 5);
 
-#ifdef OUTPUTTIME
-	time2 = clock();
-#endif // OUTPUTTIME
+	if (progressDialog->wasCanceled()) return;
+	progressDialog->setValue(13);
 
-	Mat objectAS;		//8UC1(BW)
+	Mat objectAS;
 	AddSeed(objectCN, objectEM, objectAS);
 
-#ifdef OUTPUTTIME
-	time2 = clock();
-#endif // OUTPUTTIME
+	if (progressDialog->wasCanceled()) return;
+	progressDialog->setValue(14);
 
-	Mat objectWT;		//8UC1(BW)
+	Mat objectWT;
 	WatershedTransform(objectCN, objectAS, objectDT, objectWT);
 
-#ifdef OUTPUTTIME
-	time2 = clock();
-#endif // OUTPUTTIME
+	if (progressDialog->wasCanceled()) return;
+	progressDialog->setValue(15);
 
-	Mat objectDE;		//8UC1(BW)
+	Mat objectDE;
 	DeleteEdge(objectWT, objectDE);
 
-#ifdef OUTPUTTIME
-	time2 = clock();
-#endif // OUTPUTTIME
+	if (progressDialog->wasCanceled()) return;
+	progressDialog->setValue(16);
 
 	FitEllipse(objectDE, ellipse_M, ellipse_L);
 
-#ifdef OUTPUTTIME
-	time2 = clock();
-#endif // OUTPUTTIME
+	if (progressDialog->wasCanceled()) return;
+	progressDialog->setValue(17);
+}
+
+void AutomatedGrainSizing::startProgress()
+{
+	progressDialog = new QProgressDialog(this);
+	progressDialog->setWindowModality(Qt::WindowModal);
+	progressDialog->setWindowTitle("Please Wait");
+	progressDialog->setLabelText("Running...");
+	progressDialog->setCancelButtonText("Cancel");
+	progressDialog->setRange(0, 17);
+
+	DoAutomatedGrainSizing(image, realSize, mumax, ellipse_M, ellipse_L);
+
 }

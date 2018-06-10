@@ -38,6 +38,8 @@ class ShowImage: public QWidget
 
 public:
 	ShowImage(QWidget *parent = Q_NULLPTR);
+	AutomatedGrainSizing *progressBar;
+
 	void loadImage(QString filePathName);				// load image
 	int getMuMax();										// get mu max
 

@@ -627,7 +627,12 @@ void ShowImage::automatedGrainSizing()
 {
 	perspectiveTransform();
 	cv::Mat img = QImage2Mat(warpImage);
-	AutomatedGrainSizing(img, cv::Point2i(realSize.x(), realSize.y()), getMuMax(), ellipseM, ellipseL);
+	progressBar->image = img;
+	progressBar->realSize = cv::Point2i(realSize.x(), realSize.y());
+	progressBar->mumax = getMuMax();
+	progressBar->startProgress();
+	ellipseM = progressBar->ellipse_M;
+	ellipseL = progressBar->ellipse_L;
 }
 
 void ShowImage::getRealSize(QPointF size)
