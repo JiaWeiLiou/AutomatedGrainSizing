@@ -8,6 +8,26 @@ ShowImage::ShowImage(QWidget *parent)
 	setMouseTracking(true);								// tracking mouse location
 }
 
+void ShowImage::loadImage(QString filePathName)
+{
+	loading = true;					// show loading
+	clearPoints();					// clear image widget 's point
+	initial();						// initial image widget
+	rawImage.load(filePathName);	// store image's
+	showImage = rawImage;
+	loading = false;				// show loading
+	initial();						// initial image widget
+}
+
+int ShowImage::getMuMax()
+{
+	if (warpImage2Points.size() != 2) {
+		raw2WarpImagePoints();
+	}
+	mumax = qCeil(qSqrt(qPow(warpImage2Points[0].x() - warpImage2Points[1].x(), 2) + qPow(warpImage2Points[0].y() - warpImage2Points[1].y(), 2)));
+	return mumax;
+}
+
 void ShowImage::initial()
 {
 	/* set maximum scale (maximum scale is 1/5 screen width) */
@@ -118,7 +138,7 @@ void ShowImage::mousePressEvent(QMouseEvent *event)
 				QPointF pixelPos = rawImage4Points[i] * scale + newDelta;
 				QPointF mousePos = QPointF(event->pos());
 				// distance lower than 5
-				if (qSqrt(qPow(mousePos.x() - pixelPos.x(), 2) + qPow(mousePos.y() - pixelPos.y(), 2)) < 5) {
+				if (qAbs(mousePos.x() - pixelPos.x()) + qAbs(mousePos.y() - pixelPos.y()) < 5) {
 					setCursor(Qt::CrossCursor);										// set cursor to cross type
 					QPointF imagePos = (mousePos - newDelta) / scale;	// change to image's pixel coordinate
 					// limit the point in the image
@@ -142,7 +162,7 @@ void ShowImage::mousePressEvent(QMouseEvent *event)
 					QPointF pixelPos = rawImage2Points[i] * scale + newDelta;
 					QPointF mousePos = QPointF(event->pos());
 					// distance lower than 5
-					if (qSqrt(qPow(mousePos.x() - pixelPos.x(), 2) + qPow(mousePos.y() - pixelPos.y(), 2)) < 5) {
+					if (qAbs(mousePos.x() - pixelPos.x()) + qAbs(mousePos.y() - pixelPos.y()) < 5) {
 						setCursor(Qt::CrossCursor);										// set cursor to cross type
 						QPointF imagePos = (mousePos - newDelta) / scale;	// change to image's pixel coordinate
 						// limit the point in the image
@@ -252,7 +272,7 @@ void ShowImage::mouseMoveEvent(QMouseEvent *event)
 				QPointF pixelPos = rawImage4Points[modifiedPointState - 1] * scale + newDelta;
 				QPointF mousePos = QPointF(event->pos());
 				// move distance lower than 50
-				if (qSqrt(qPow(mousePos.x() - pixelPos.x(), 2) + qPow(mousePos.y() - pixelPos.y(), 2)) < 50) {
+				if (qAbs(mousePos.x() - pixelPos.x()) + qAbs(mousePos.y() - pixelPos.y()) < 50) {
 					setCursor(Qt::CrossCursor);	// set cursor to cross type
 					QPointF imagePos = (mousePos - newDelta) / scale;	// change to image's pixel coordinate
 					// limit the point in the image
@@ -271,7 +291,7 @@ void ShowImage::mouseMoveEvent(QMouseEvent *event)
 				QPointF pixelPos = rawImage2Points[modifiedPointState - 5] * scale + newDelta;
 				QPointF mousePos = QPointF(event->pos());
 				// move distance lower than 50
-				if (qSqrt(qPow(mousePos.x() - pixelPos.x(), 2) + qPow(mousePos.y() - pixelPos.y(), 2)) < 50) {
+				if (qAbs(mousePos.x() - pixelPos.x()) + qAbs(mousePos.y() - pixelPos.y()) < 50) {
 					setCursor(Qt::CrossCursor);	// set cursor to cross type
 					QPointF imagePos = (mousePos - newDelta) / scale;	// change to image's pixel coordinate
 					// limit the point in the image
@@ -507,6 +527,48 @@ void ShowImage::paintEvent(QPaintEvent *event)
 	style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }
 
+void ShowImage::raw2WarpImagePoints()
+{
+	if (warpImage2Points.size() > rawImage2Points.size()) {
+		for (size_t i = warpImage2Points.size(); i > rawImage2Points.size(); --i) {
+			warpImage2Points.pop_back();
+		}
+	} else {
+		cv::Matx33f warpMatrix = perspectiveMatrix;
+		for (size_t i = 0; i < rawImage2Points.size(); ++i) {
+			cv::Point3f p(rawImage2Points[i].x(), rawImage2Points[i].y(), 1);
+			p = warpMatrix * p;
+			p = p * (1.0f / p.z);
+			if (i < warpImage2Points.size()) {
+				warpImage2Points[i] = QPointF(p.x, p.y);
+			} else {
+				warpImage2Points << QPointF(p.x, p.y);
+			}
+		}
+	}
+}
+
+void ShowImage::warp2RawImagePoints()
+{
+	if (warpImage2Points.size() < rawImage2Points.size()) {
+		for (size_t i = rawImage2Points.size(); i > warpImage2Points.size(); --i) {
+			rawImage2Points.pop_back();
+		}
+	} else {
+		cv::Matx33f warpMatrix = perspectiveMatrix;
+		for (size_t i = 0; i < warpImage2Points.size(); ++i) {
+			cv::Point3f p(warpImage2Points[i].x(), warpImage2Points[i].y(), 1);
+			p = warpMatrix.inv() * p;
+			p = p * (1.0f / p.z);
+			if (i < rawImage2Points.size()) {
+				rawImage2Points[i] = QPointF(p.x, p.y);
+			} else {
+				rawImage2Points << QPointF(p.x, p.y);
+			}
+		}
+	}
+}
+
 void ShowImage::perspectiveTransform()
 {
 	if (image4PointModified) {
@@ -545,15 +607,27 @@ void ShowImage::perspectiveTransform()
 			H = Hp;
 		}
 
+		// set warpImage4Points
 		warpImage4Points << QPointF(0, 0) << QPointF(W, 0) << QPointF(W, H) << QPointF(0, H) << QPointF(0, 0);
 		cv::Point2f aPt[4] = { cv::Point2f(0, 0), cv::Point2f(W, 0), cv::Point2f(W, H), cv::Point2f(0, H) };
 		cv::Mat rawImg = ShowImage::QImage2Mat(rawImage);
 		perspectiveMatrix = cv::getPerspectiveTransform(bPt, aPt);
 
+		// set warpImage2Points
+		raw2WarpImagePoints();
+
 		cv::Mat warpImg;
 		cv::warpPerspective(rawImg, warpImg, perspectiveMatrix, cv::Size(W, H), cv::INTER_CUBIC);
 		warpImage = ShowImage::Mat2QImage(warpImg);
+		image4PointModified = 0;
 	}
+}
+
+void ShowImage::automatedGrainSizing()
+{
+	perspectiveTransform();
+	cv::Mat img = QImage2Mat(warpImage);
+	AutomatedGrainSizing(img, cv::Point2i(realSize.x(), realSize.y()), getMuMax(), ellipseM, ellipseL);
 }
 
 void ShowImage::getRealSize(QPointF size)
@@ -565,50 +639,13 @@ void ShowImage::getCheckBoxState(int checkBoxState)
 {
 	if (checkBoxState == Qt::Unchecked) {
 		ShowImage::checkBoxState = Qt::Unchecked;
-
+		warp2RawImagePoints();
 		showImage = rawImage;
-		if (warpImage2Points.size() < rawImage2Points.size()) {
-			for (size_t i = rawImage2Points.size(); i > warpImage2Points.size(); --i) {
-				rawImage2Points.pop_back();
-			}
-		} else {
-			cv::Matx33f warpMatrix = perspectiveMatrix;
-			for (size_t i = 0; i < warpImage2Points.size(); ++i) {
-				cv::Point3f p(warpImage2Points[i].x(), warpImage2Points[i].y(), 1);
-				p = warpMatrix.inv() * p;
-				p = p * (1.0f / p.z);
-				if (i < rawImage2Points.size()) {
-					rawImage2Points[i] = QPointF(p.x, p.y);
-				} else {
-					rawImage2Points << QPointF(p.x, p.y);
-				}
-			}
-		}
-
 		initial();
 	} else {
 		ShowImage::checkBoxState = Qt::Checked;
 		perspectiveTransform();
-		image4PointModified = 0;
 		showImage = warpImage;
-		if (warpImage2Points.size() > rawImage2Points.size()) {
-			for (size_t i = warpImage2Points.size(); i > rawImage2Points.size(); --i) {
-				warpImage2Points.pop_back();
-			}
-		} else {
-			cv::Matx33f warpMatrix = perspectiveMatrix;
-			for (size_t i = 0; i < rawImage2Points.size(); ++i) {
-				cv::Point3f p(rawImage2Points[i].x(), rawImage2Points[i].y(), 1);
-				p = warpMatrix * p;
-				p = p * (1.0f / p.z);
-				if (i < warpImage2Points.size()) {
-					warpImage2Points[i] = QPointF(p.x, p.y);
-				} else {
-					warpImage2Points << QPointF(p.x, p.y);
-				}
-			}
-		}
-
 		initial();
 	}
 }

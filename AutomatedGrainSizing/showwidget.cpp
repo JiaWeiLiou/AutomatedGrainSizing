@@ -69,7 +69,7 @@ ShowWidget::ShowWidget(QWidget *parent)
 	connect(warpCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setLineEditEnable(int)));
 	connect(this, SIGNAL(emitRealSize(QPointF)), imageWidget, SLOT(getRealSize(QPointF)));
 	connect(warpCheckBox, SIGNAL(stateChanged(int)), imageWidget, SLOT(getCheckBoxState(int)));
-	connect(startPushButton, SIGNAL(clicked()), this, SLOT(automatedGrainSizing()));
+	connect(startPushButton, SIGNAL(clicked()), imageWidget, SLOT(automatedGrainSizing()));
 }
 
 void ShowWidget::setWidgetEnable()
@@ -108,23 +108,4 @@ void ShowWidget::setLineEditEnable(int checkBoxState)
 		heightLineEdit->setEnabled(false);
 		hUintLabel->setEnabled(false);
 	}
-}
-
-void ShowWidget::automatedGrainSizing()
-{
-	imageWidget->perspectiveTransform();
-	cv::Matx33f warpMatrix = imageWidget->perspectiveMatrix;
-	for (size_t i = 0; i < imageWidget->rawImage2Points.size(); ++i) {
-		cv::Point3f p(imageWidget->rawImage2Points[i].x(), imageWidget->rawImage2Points[i].y(), 1);
-		p = warpMatrix * p;
-		p = p * (1.0f / p.z);
-		if (i < imageWidget->warpImage2Points.size()) {
-			imageWidget->warpImage2Points[i] = QPointF(p.x, p.y);
-		} else {
-			imageWidget->warpImage2Points << QPointF(p.x, p.y);
-		}
-	}
-	mumax = qCeil(qSqrt(qPow(imageWidget->warpImage2Points[0].x() - imageWidget->warpImage2Points[1].x(), 2) + qPow(imageWidget->warpImage2Points[0].y() - imageWidget->warpImage2Points[1].y(), 2)));
-	cv::Mat img = imageWidget->QImage2Mat(imageWidget->warpImage);
-	AutomatedGrainSizing(img, cv::Point2i(realSize.x(), realSize.y()), mumax, ellipseM, ellipseL);
 }

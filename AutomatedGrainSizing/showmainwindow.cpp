@@ -28,23 +28,14 @@ void ShowMainWindow::dropEvent(QDropEvent *event)
 	filePathName = urls.first().toLocalFile();
 	if (filePathName.isEmpty()) {
 		return;
-	}
-
-	if (!filePathName.isEmpty()) {
+	} else {
 		int pos1 = filePathName.lastIndexOf('/');
 		filePath = filePath.left(pos1 + 1);									//file path
 		fileName = filePathName.right(filePathName.size() - pos1 - 1);		//file name
 	}
 
-	setWindowTitle(fileName + QString(" - Automated Grain Sizing"));
-
-	showWidget->imageWidget->loading = true;			// show loading
-	showWidget->imageWidget->clearPoints();				// clear image widget 's point
-	showWidget->imageWidget->initial();					// initial image widget
-	showWidget->imageWidget->rawImage.load(filePathName);	// store image's
-	showWidget->imageWidget->showImage = showWidget->imageWidget->rawImage;
-	showWidget->imageWidget->loading = false;			// show loading
-	showWidget->imageWidget->initial();					// initial image widget
+	setWindowTitle(fileName + QString(" - Automated Grain Sizing"));		// set windows title
+	showWidget->imageWidget->loadImage(filePathName);						// store image
 }
 
 void ShowMainWindow::createActions()

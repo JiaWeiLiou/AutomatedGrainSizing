@@ -12,13 +12,13 @@ class ShowMainWindow : public QMainWindow
 
 public:
 	ShowMainWindow(QWidget *parent = Q_NULLPTR);
+
+protected:
 	QString filePathName;							// store image path and name
 	QString filePath;								// store image path
 	QString fileName;								// store image name
 	void createActions();
 	void createMenus();
-
-protected:
 	void dragEnterEvent(QDragEnterEvent *event);	// drag event
 	void dropEvent(QDropEvent *event);				// drop event
 

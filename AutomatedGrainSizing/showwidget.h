@@ -11,7 +11,6 @@
 #include <QString>
 #include <QPointF>
 #include "showimage.h"
-#include "automatedgrainsizing.h"
 
 class ShowWidget : public QWidget
 {
@@ -19,15 +18,15 @@ class ShowWidget : public QWidget
 public:
 	ShowWidget(QWidget *parent = Q_NULLPTR);
 
-	ShowImage *imageWidget;
-	QCheckBox *warpCheckBox;
-	QLabel *widthLabel;
-	QLineEdit *widthLineEdit;
-	QLabel *wUintLabel;
-	QLabel *heightLabel;
-	QLineEdit *heightLineEdit;
-	QLabel *hUintLabel;
-	QPushButton *startPushButton;
+	ShowImage		*imageWidget;
+	QCheckBox		*warpCheckBox;
+	QLabel			*widthLabel;
+	QLineEdit		*widthLineEdit;
+	QLabel			*wUintLabel;
+	QLabel			*heightLabel;
+	QLineEdit		*heightLineEdit;
+	QLabel			*hUintLabel;
+	QPushButton		*startPushButton;
 	QPointF realSize;
 	int mumax;
 	vector<float> ellipseM;
@@ -39,5 +38,4 @@ signals:
 private slots:
 	void setWidgetEnable();
 	void setLineEditEnable(int checkBoxState);
-	void automatedGrainSizing();
 };
