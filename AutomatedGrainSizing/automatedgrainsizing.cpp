@@ -230,7 +230,7 @@ void AutomatedGrainSizing::boxBlurM(InputArray _gray, OutputArray _blur, size_t 
 	}
 }
 
-void AutomatedGrainSizing::GaussianBlurF(InputArray _gray, OutputArray _blur, const double sigma, int n)
+bool AutomatedGrainSizing::GaussianBlurF(InputArray _gray, OutputArray _blur, const double sigma, int n)
 {
 	Mat gray = _gray.getMat();
 	_blur.create(gray.size(), CV_8UC1);
@@ -253,9 +253,11 @@ void AutomatedGrainSizing::GaussianBlurF(InputArray _gray, OutputArray _blur, co
 		boxBlurM(grayblur, blur, (size - 1) / 2);
 		blur.copyTo(grayblur);
 
-		if (progressDialog->wasCanceled()) return;
+		if (progressDialog->wasCanceled()) return true;
 		progressDialog->setValue(++num);
 	}
+
+	return false;
 }
 
 void AutomatedGrainSizing::DivideArea(InputArray _gray, InputArray _blur, OutputArray _divide)
@@ -986,7 +988,7 @@ void AutomatedGrainSizing::FitEllipse(InputArray _object, vector<float> &ellipse
 	std::sort(ellipse_L.begin(), ellipse_L.end());
 }
 
-void AutomatedGrainSizing::DoAutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> &ellipse_M, vector<float> &ellipse_L)
+bool AutomatedGrainSizing::DoAutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> &ellipse_M, vector<float> &ellipse_L)
 {
 	int n = 5;
 	int ksize = round(mumax * 5);
@@ -1001,108 +1003,108 @@ void AutomatedGrainSizing::DoAutomatedGrainSizing(Mat image, Point2i realSize, i
 
 	progressDialog->setRange(0, 18 + (n + m));
 
-	if (progressDialog->wasCanceled()) return;
+	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
 	Mat gray;
 	RGBToGray(image, gray);
 
-	if (progressDialog->wasCanceled()) return;
+	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
 	Mat grayBlur;
-	GaussianBlurF(gray, grayBlur, sigma, n);
+	bool cancel = GaussianBlurF(gray, grayBlur, sigma, n);
 
-	if (progressDialog->wasCanceled()) return;
+	if (progressDialog->wasCanceled() || cancel) return false;
 	progressDialog->setValue(++num);
 
 	Mat grayDIV;
 	DivideArea(gray, grayBlur, grayDIV);
 
-	if (progressDialog->wasCanceled()) return;
+	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
 	Mat grayTH;
 	KittlerThresholdArea(grayDIV, grayTH);
 
-	if (progressDialog->wasCanceled()) return;
+	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
 	Mat gradm;
 	Gradient(gray, gradm);
 
-	if (progressDialog->wasCanceled()) return;
+	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
 	Mat gradmBlur;
 	blur(gradm, gradmBlur, Size(5, 5));
 
-	if (progressDialog->wasCanceled()) return;
+	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
 	Mat gradmDB;
 	DivideLineBinary(gradm, gradmBlur, gradmDB);
 
-	if (progressDialog->wasCanceled()) return;
+	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
 	Mat lineHC;
 	HysteresisCut(gradmDB, grayTH, lineHC);
 
-	if (progressDialog->wasCanceled()) return;
+	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
 	Mat objectCOM;
 	Combine(grayTH, lineHC, objectCOM);
 
-	if (progressDialog->wasCanceled()) return;
+	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
 	Mat objectOpen;
 	Mat elementO = (Mat_<uchar>(5, 5) << 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0); // circle
 	cv::morphologyEx(objectCOM, objectOpen, MORPH_OPEN, elementO);
 
-	if (progressDialog->wasCanceled()) return;
+	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
 	Mat objectCN;
 	ClearNoise(objectOpen, objectCN, mumax);
 
-	if (progressDialog->wasCanceled()) return;
+	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
 	Mat objectDT;
 	cv::distanceTransform(objectCN, objectDT, CV_DIST_L2, 3);
 
-	if (progressDialog->wasCanceled()) return;
+	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
 	Mat objectEM;
 	ExtendRegionalMinima(objectDT, objectEM, 5);
 
-	if (progressDialog->wasCanceled()) return;
+	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
 	Mat objectAS;
 	AddSeed(objectCN, objectEM, objectAS);
 
-	if (progressDialog->wasCanceled()) return;
+	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
 	Mat objectWT;
 	WatershedTransform(objectCN, objectAS, objectDT, objectWT);
 
-	if (progressDialog->wasCanceled()) return;
+	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
 	Mat objectDE;
 	DeleteEdge(objectWT, objectDE);
 
-	if (progressDialog->wasCanceled()) return;
+	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
 	FitEllipse(objectDE, ellipse_M, ellipse_L);
 
-	if (progressDialog->wasCanceled()) return;
 	progressDialog->setValue(++num);
+	return true;
 }

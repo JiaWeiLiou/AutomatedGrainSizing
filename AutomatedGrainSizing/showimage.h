@@ -50,6 +50,9 @@ public:
 	bool image4PointsFull = 0;							// image 4 points full
 	bool image2PointsFull = 0;							// image 2 points full
 	bool loading = false;								// loading file
+	bool image4PointModified = 1;						// record 4 points modified(0 - not mod, 1 - mod)
+	bool image2PointModified = 1;						// record 2 points modified(0 - not mod, 1 - mod)
+	bool finish = 0;									// record AGS has been done or not
 	QImage showImage;									// image to show
 	QImage rawImage;									// store raw image
 	QImage warpImage;									// store transform image
@@ -80,8 +83,6 @@ private:
 	bool outBorder = 0;									// record point is out of border or not
 	int modifiedPointState;								// record modify of points (0 to 6, 0 is not modified)
 	int checkBoxState = 0;								// record checkBox state
-	bool image4PointModified = 1;						// record 4 points modified(0 - not mod, 1 - mod)
-	bool startPushed = 0;								// record startPushButton pushed or not
 	QPointF realSize;									// record lineEdit size
 	int mumax;											// record grain's max grain size
 	void raw2WarpImagePoints();							// raw image points to warp image points
@@ -90,7 +91,7 @@ private:
 	cv::Mat ShowImage::QImage2Mat(QImage image);		// QImage to Mat
 
 signals:
-	void pointsNumberChanged();							// points change
+	void pointModified();								// points modified
 
 private slots:
 	void getRealSize(QPointF size);						// get lineEdit size

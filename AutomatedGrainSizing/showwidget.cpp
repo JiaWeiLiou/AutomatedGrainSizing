@@ -63,7 +63,7 @@ ShowWidget::ShowWidget(QWidget *parent)
 	mainLayout->addLayout(hLayout);
 
 	//set signal and slot connect
-	connect(imageWidget, SIGNAL(pointsNumberChanged()), this, SLOT(setWidgetEnable()));
+	connect(imageWidget, SIGNAL(pointModified()), this, SLOT(setWidgetEnable()));
 	connect(heightLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setWidgetEnable()));
 	connect(widthLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setWidgetEnable()));
 	connect(warpCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setLineEditEnable(int)));
@@ -84,9 +84,15 @@ void ShowWidget::setWidgetEnable()
 		warpCheckBox->setEnabled(false);
 	}
 
-	if (imageWidget->image2PointsFull && Wvalue > 0 && Hvalue > 0) {
+	if (imageWidget->image2PointsFull && Wvalue > 0 && Hvalue > 0 && (!imageWidget->finish || imageWidget->image4PointModified || imageWidget->image2PointModified)) {
+		startPushButton->setText("Start");
 		startPushButton->setEnabled(true);
 	} else {
+		if (imageWidget->finish && !imageWidget->image4PointModified && !imageWidget->image2PointModified) {
+			startPushButton->setText("Finished");
+		} else {
+			startPushButton->setText("Start");
+		}
 		startPushButton->setEnabled(false);
 	}
 }

@@ -12,7 +12,7 @@ void ShowImage::loadImage(QString filePathName)
 {
 	loading = true;					// show loading
 	clearPoints();					// clear image widget 's point
-	initial();						// initial image widget
+	repaint();						// repaint image widget
 	rawImage.load(filePathName);	// store image's
 	showImage = rawImage;
 	loading = false;				// show loading
@@ -58,11 +58,13 @@ void ShowImage::clearPoints()
 		image4PointsFull = 0;
 		image2PointsFull = 0;
 		image4PointModified = 1;
-		emit pointsNumberChanged();
+		image2PointModified = 1;
+		emit pointModified();
 	} else {
 		warpImage2Points.clear();
 		image2PointsFull = 0;
-		emit pointsNumberChanged();
+		image2PointModified = 1;
+		emit pointModified();
 	}
 }
 
@@ -145,6 +147,7 @@ void ShowImage::mousePressEvent(QMouseEvent *event)
 						// record file.
 						rawImage4Points[i] = imagePos;
 						image4PointModified = 1;
+						emit pointModified();
 						outBorder = false;
 						modifiedPointState = i + 1;
 						update();
@@ -168,6 +171,8 @@ void ShowImage::mousePressEvent(QMouseEvent *event)
 						if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
 							// record file.
 							rawImage2Points[i] = imagePos;
+							image2PointModified = 1;
+							emit pointModified();
 							outBorder = false;
 							modifiedPointState = i + 5;
 							update();
@@ -188,7 +193,7 @@ void ShowImage::mousePressEvent(QMouseEvent *event)
 					// record file.
 					rawImage4Points.push_back(imagePos);
 					image4PointModified = 1;
-					emit pointsNumberChanged();
+					emit pointModified();
 					outBorder = false;
 					update();
 				} else {
@@ -201,7 +206,8 @@ void ShowImage::mousePressEvent(QMouseEvent *event)
 				if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
 					// record file.
 					rawImage2Points.push_back(imagePos);
-					emit pointsNumberChanged();
+					image2PointModified = 1;
+					emit pointModified();
 					outBorder = false;
 					update();
 				} else {
@@ -221,6 +227,8 @@ void ShowImage::mousePressEvent(QMouseEvent *event)
 					if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
 						// record file.
 						warpImage2Points[i] = imagePos;
+						image2PointModified = 1;
+						emit pointModified();
 						outBorder = false;
 						modifiedPointState = i + 5;
 						update();
@@ -237,7 +245,8 @@ void ShowImage::mousePressEvent(QMouseEvent *event)
 				if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
 					// record file.
 					warpImage2Points.push_back(imagePos);
-					emit pointsNumberChanged();
+					image2PointModified = 1;
+					emit pointModified();
 					outBorder = false;
 					update();
 				} else {
@@ -279,6 +288,7 @@ void ShowImage::mouseMoveEvent(QMouseEvent *event)
 						// record file.
 						rawImage4Points[modifiedPointState - 1] = imagePos;
 						image4PointModified = 1;
+						emit pointModified();
 						outBorder = false;
 						update();
 					} else {
@@ -297,6 +307,8 @@ void ShowImage::mouseMoveEvent(QMouseEvent *event)
 					if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
 						// record file.
 						rawImage2Points[modifiedPointState - 5] = imagePos;
+						image2PointModified = 1;
+						emit pointModified();
 						outBorder = false;
 						update();
 					} else {
@@ -316,10 +328,13 @@ void ShowImage::mouseMoveEvent(QMouseEvent *event)
 					if (outBorder) {
 						rawImage4Points.push_back(imagePos);
 						image4PointModified = 1;
+						emit pointModified();
 						outBorder = false;
 						// mousePress points isn't out of border 
 					} else {
 						rawImage4Points[rawImage4Points.size() - 1] = imagePos;
+						image4PointModified = 1;
+						emit pointModified();
 					}
 					update();
 				}
@@ -332,10 +347,14 @@ void ShowImage::mouseMoveEvent(QMouseEvent *event)
 					// mousePress points is out of border 
 					if (outBorder) {
 						rawImage2Points.push_back(imagePos);
+						image2PointModified = 1;
+						emit pointModified();
 						outBorder = false;
 						// mousePress points isn't out of border 
 					} else {
 						rawImage2Points[rawImage2Points.size() - 1] = imagePos;
+						image2PointModified = 1;
+						emit pointModified();
 					}
 					update();
 				}
@@ -353,6 +372,8 @@ void ShowImage::mouseMoveEvent(QMouseEvent *event)
 					if (imagePos.x() >= 0 && imagePos.x() <= (imgW - 1) && imagePos.y() >= 0 && imagePos.y() <= (imgH - 1)) {
 						// record file.
 						warpImage2Points[modifiedPointState - 5] = imagePos;
+						image2PointModified = 1;
+						emit pointModified();
 						outBorder = false;
 						update();
 					} else {
@@ -369,10 +390,14 @@ void ShowImage::mouseMoveEvent(QMouseEvent *event)
 					// mousePress points is out of border 
 					if (outBorder) {
 						warpImage2Points.push_back(imagePos);
+						image2PointModified = 1;
+						emit pointModified();
 						outBorder = false;
 						// mousePress points isn't out of border 
 					} else {
 						warpImage2Points[warpImage2Points.size() - 1] = imagePos;
+						image2PointModified = 1;
+						emit pointModified();
 					}
 					update();
 				}
@@ -399,7 +424,7 @@ void ShowImage::mouseReleaseEvent(QMouseEvent *event)
 		} else {
 			image2PointsFull = warpImage2Points.size() == 2 ? 1 : 0;
 		}
-		if (image2PointsFull) { emit pointsNumberChanged(); }
+		if (image2PointsFull) { emit pointModified(); }
 	}
 	update();
 }
@@ -415,19 +440,19 @@ void ShowImage::keyPressEvent(QKeyEvent *event)
 			if (rawImage2Points.size()) {
 				rawImage2Points.pop_back();	// delete points
 				image2PointsFull = 0;
-				emit pointsNumberChanged();
+				emit pointModified();
 				update();
 			} else if (rawImage4Points.size()) {
 				rawImage4Points.pop_back();	// delete points
 				image4PointsFull = 0;
-				emit pointsNumberChanged();
+				emit pointModified();
 				update();
 			}
 		} else {
 			if (warpImage2Points.size()) {
 				warpImage2Points.pop_back();	// delete points
 				image2PointsFull = 0;
-				emit pointsNumberChanged();
+				emit pointModified();
 				update();
 			}
 		}
@@ -626,10 +651,14 @@ void ShowImage::perspectiveTransform()
 
 void ShowImage::startProcessing()
 {
-	progressBar = new AutomatedGrainSizing;
-	perspectiveTransform();
-	cv::Mat img = QImage2Mat(warpImage);
-	progressBar->DoAutomatedGrainSizing(img, cv::Point2i(realSize.x(), realSize.y()), getMuMax(), ellipseM, ellipseL);
+	if (!finish || image4PointModified || image2PointModified) {
+		progressBar = new AutomatedGrainSizing;
+		perspectiveTransform();
+		image2PointModified = 0;
+		cv::Mat img = QImage2Mat(warpImage);
+		finish = progressBar->DoAutomatedGrainSizing(img, cv::Point2i(realSize.x(), realSize.y()), getMuMax(), ellipseM, ellipseL);
+		emit pointModified();
+	}
 }
 
 void ShowImage::getRealSize(QPointF size)
@@ -703,6 +732,9 @@ cv::Mat ShowImage::QImage2Mat(QImage image)
 		cv::cvtColor(mat, mat, CV_BGR2RGB);
 		break;
 	case QImage::Format_Indexed8:
+		mat = cv::Mat(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
+		break;
+	case QImage::Format_Grayscale8:
 		mat = cv::Mat(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
 		break;
 	}

@@ -40,7 +40,7 @@ public:
 	//Box Blur
 	void boxBlurM(InputArray _gray, OutputArray _blur, size_t r);
 	//Fast Gaussian Blur
-	void GaussianBlurF(InputArray _gray, OutputArray _blur, const double sigmam ,int n);
+	bool GaussianBlurF(InputArray _gray, OutputArray _blur, const double sigmam ,int n);
 	//Remove Ambient Light for Area
 	void DivideArea(InputArray _gray, InputArray _blur, OutputArray _divide);
 	//Kittler Threshold for Area
@@ -110,5 +110,5 @@ public:
 	//Fitting Ellipse
 	void FitEllipse(InputArray _object, vector<float> &ellipse_M, vector<float> &ellipse_L);
 
-	void DoAutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> &ellipse_M, vector<float> &ellipse_L);
+	bool DoAutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> &ellipse_M, vector<float> &ellipse_L);
 };
