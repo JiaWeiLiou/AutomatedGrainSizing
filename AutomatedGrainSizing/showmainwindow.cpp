@@ -60,15 +60,15 @@ void ShowMainWindow::createActions()
 	closeImageAction->setShortcut(tr("Ctrl+C"));
 	closeImageAction->setToolTip("Close Image");
 
-	// Save Parameter
-	saveParameterAction = new QAction("&Save Parameter(S)", this);
-	saveParameterAction->setShortcut(tr("Ctrl+S"));
-	saveParameterAction->setToolTip("Save Parameter");
+	//// Save Parameter
+	//saveParameterAction = new QAction("&Save Parameter(S)", this);
+	//saveParameterAction->setShortcut(tr("Ctrl+S"));
+	//saveParameterAction->setToolTip("Save Parameter");
 
-	// Save Parameter As
-	saveParameterAsAction = new QAction("&Save Parameter As(A)...", this);
-	saveParameterAsAction->setShortcut(tr("Ctrl+A"));
-	saveParameterAsAction->setToolTip("Save Parameter As");
+	//// Save Parameter As
+	//saveParameterAsAction = new QAction("&Save Parameter As(A)...", this);
+	//saveParameterAsAction->setShortcut(tr("Ctrl+A"));
+	//saveParameterAsAction->setToolTip("Save Parameter As");
 
 	// Quit
 	quitAction = new QAction("&Quit(Q)", this);
