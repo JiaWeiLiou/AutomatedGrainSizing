@@ -33,8 +33,8 @@ private:
 	QAction *openImageAction;
 	QAction *loadParameterAction;
 	QAction *closeImageAction;
-	QAction *saveParameterAction;
-	QAction *saveParameterAsAction;
+	//QAction *saveParameterAction;
+	//QAction *saveParameterAsAction;
 	QAction *quitAction;
 
 	// Options Menu Action

@@ -84,8 +84,8 @@ void ShowMainWindow::createMenus()
 	fileMenu->addAction(loadParameterAction);
 	fileMenu->addSeparator();
 	fileMenu->addAction(closeImageAction);
-	fileMenu->addAction(saveParameterAction);
-	fileMenu->addAction(saveParameterAsAction);
+	//fileMenu->addAction(saveParameterAction);
+	//fileMenu->addAction(saveParameterAsAction);
 	fileMenu->addSeparator();
 	fileMenu->addAction(quitAction);
 
