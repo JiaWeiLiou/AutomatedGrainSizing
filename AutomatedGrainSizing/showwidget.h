@@ -39,4 +39,5 @@ private slots:
 	void setWidgetEnable();
 	void setLineEditEnable(int checkBoxState);
 	void getRealSize(QPoint size);						// get lineEdit size
+	void setFinished();
 };

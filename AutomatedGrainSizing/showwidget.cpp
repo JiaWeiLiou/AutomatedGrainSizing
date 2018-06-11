@@ -66,6 +66,8 @@ ShowWidget::ShowWidget(QWidget *parent)
 	connect(imageWidget, SIGNAL(pointModified()), this, SLOT(setWidgetEnable()));
 	connect(heightLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setWidgetEnable()));
 	connect(widthLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setWidgetEnable()));
+	connect(heightLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setFinished()));
+	connect(widthLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setFinished()));
 	connect(warpCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setLineEditEnable(int)));
 	connect(this, SIGNAL(emitRealSize(QPointF)), imageWidget, SLOT(getRealSize(QPointF)));
 	connect(imageWidget, SIGNAL(emitRealSize(QPoint)), this, SLOT(getRealSize(QPoint)));
@@ -122,4 +124,19 @@ void ShowWidget::getRealSize(QPoint size)
 {
 	widthLineEdit->setText(QString::number(size.x()));
 	heightLineEdit->setText(QString::number(size.y()));
+}
+
+void ShowWidget::setFinished()
+{
+	imageWidget->finish = 0;
+	
+	int Wvalue = widthLineEdit->text().toInt();
+	int Hvalue = heightLineEdit->text().toInt();
+	if (imageWidget->image2PointsFull && Wvalue > 0 && Hvalue > 0) {
+		startPushButton->setText("Start");
+		startPushButton->setEnabled(true);
+	} else {
+		startPushButton->setText("Start");
+		startPushButton->setEnabled(false);
+	}
 }

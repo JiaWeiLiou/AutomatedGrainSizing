@@ -3,6 +3,9 @@
 ShowMainWindow::ShowMainWindow(QWidget *parent)
 	: QMainWindow(parent)
 {
+	QTime t;
+	t.start();
+	while (t.elapsed()<1000);
 	setWindowTitle("Automated Grain Sizing");
 	showWidget = new ShowWidget(this);
 	setCentralWidget(showWidget);
@@ -69,6 +72,14 @@ void ShowMainWindow::createActions()
 	quitAction = new QAction("&Quit(Q)", this);
 	quitAction->setShortcut(tr("Ctrl+Q"));
 	connect(quitAction, SIGNAL(triggered()), this, SLOT(close()));
+
+	// Information
+	information = new QAction("Information", this);
+	//connect(information, SIGNAL(triggered()), this, SLOT(close()));
+
+	// Information
+	about = new QAction("About", this);
+	//connect(about, SIGNAL(triggered()), this, SLOT(QApplication::aboutQt()));
 }
 
 void ShowMainWindow::createMenus()
@@ -87,6 +98,8 @@ void ShowMainWindow::createMenus()
 
 	// Help Menu
 	helpMenu = menuBar()->addMenu("&Help(H)");
+	helpMenu->addAction(information);
+	helpMenu->addAction(about);
 }
 
 void ShowMainWindow::showOpenImage()

@@ -6,6 +6,7 @@
 #include <QAction>
 #include <QFileDialog>
 #include <QProcessEnvironment>
+#include <QTime>
 #include "showwidget.h"
 
 class ShowMainWindow : public QMainWindow
