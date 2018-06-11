@@ -83,12 +83,12 @@ void ShowImage::saveParameter(QString filePathName)
 		QTextStream out(&file);
 		out << dec << fixed;
 		for (int i = 0; i < rawImage4Points.size(); ++i) {
-			out << rawImage4Points[i].x() << "\t" << rawImage4Points[i].y() << "\n";
+			out << QString::number(rawImage4Points[i].x()) << "\t" << QString::number(rawImage4Points[i].y()) << "\n";
 		}
 		for (int i = 0; i < rawImage2Points.size(); ++i) {
-			out << rawImage2Points[i].x() << "\t" << rawImage2Points[i].y() << "\n";
+			out << QString::number(rawImage2Points[i].x()) << "\t" << QString::number(rawImage2Points[i].y()) << "\n";
 		}
-		out << realSize.x() << "\t" << realSize.y() << "\n";
+		out << QString::number(realSize.x()) << "\t" << QString::number(realSize.y()) << "\n";
 		out << getMuMax() << "\n";
 		out << endl;
 		file.close();
