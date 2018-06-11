@@ -52,7 +52,7 @@ void ShowImage::loadParameter(QString filePathName)
 		}
 		file.close();
 
-		if (i < 6) {
+		if (i < 6 || i > 9) {
 			rawImage4Points.clear();
 			rawImage2Points.clear();
 		} else {

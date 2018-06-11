@@ -4,6 +4,8 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QAction>
+#include <QFileDialog>
+#include <QProcessEnvironment>
 #include "showwidget.h"
 
 class ShowMainWindow : public QMainWindow
@@ -15,7 +17,6 @@ public:
 
 protected:
 	QString filePathName;							// store image path and name
-	QString fileName;								// store image name
 	void createActions();
 	void createMenus();
 	void dragEnterEvent(QDragEnterEvent *event);	// drag event
@@ -33,8 +34,6 @@ private:
 	QAction *openImageAction;
 	QAction *loadParameterAction;
 	QAction *closeImageAction;
-	//QAction *saveParameterAction;
-	//QAction *saveParameterAsAction;
 	QAction *quitAction;
 
 	// Options Menu Action
@@ -46,4 +45,9 @@ private:
 	// Help Menu Action
 	QAction *information;
 	QAction *about;
+
+protected slots:
+	void showOpenImage();
+	void showLoadParameter();
+	void showCloseImage();
 };
