@@ -30,6 +30,9 @@ bool ShowImage::loadImage(QString filePathName)
 
 void ShowImage::loadParameter(QString filePathName)
 {
+	rawImage4Points.clear();
+	rawImage2Points.clear();
+
 	int pos1 = filePathName.lastIndexOf('.');
 	QString filePath = filePathName.left(pos1);			//file path
 	QFile file(filePath + ".param");
