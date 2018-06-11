@@ -947,7 +947,7 @@ void AutomatedGrainSizing::DeleteEdge(InputArray _binary, OutputArray _object)
 	}
 }
 
-void AutomatedGrainSizing::FitEllipse(InputArray _object, vector<float> &ellipse_M, vector<float> &ellipse_L)
+void AutomatedGrainSizing::FitEllipse(InputArray _object, Point2i realSize, vector<float> &ellipse_M, vector<float> &ellipse_L)
 {
 	Mat object = _object.getMat();
 
@@ -980,12 +980,14 @@ void AutomatedGrainSizing::FitEllipse(InputArray _object, vector<float> &ellipse
 	for (size_t i = 0; i < objectNum; ++i) {
 		if (pointset[i].size() > 5) {
 			RotatedRect ellipse_obj = fitEllipse(pointset[i]);
-			if (ellipse_obj.size.width < ellipse_obj.size.height) {
-				ellipse_M.push_back(ellipse_obj.size.width);
-				ellipse_L.push_back(ellipse_obj.size.height);
+			float w = ellipse_obj.size.width * (float)(realSize.x) / (float)(object.cols);
+			float h = ellipse_obj.size.height * (float)(realSize.y) / (float)(object.rows);
+			if (w < h) {
+				ellipse_M.push_back(w);
+				ellipse_L.push_back(h);
 			} else {
-				ellipse_M.push_back(ellipse_obj.size.height);
-				ellipse_L.push_back(ellipse_obj.size.width);
+				ellipse_M.push_back(h);
+				ellipse_L.push_back(w);
 			}
 		}
 	}
@@ -1109,7 +1111,7 @@ bool AutomatedGrainSizing::DoAutomatedGrainSizing(Mat image, Point2i realSize, i
 	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
-	FitEllipse(objectDE, ellipse_M, ellipse_L);
+	FitEllipse(objectDE, realSize, ellipse_M, ellipse_L);
 
 	progressDialog->setValue(++num);
 	return true;

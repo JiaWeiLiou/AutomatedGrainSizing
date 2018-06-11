@@ -108,7 +108,7 @@ public:
 	//Delete Edge object
 	void DeleteEdge(InputArray _binary, OutputArray _object);
 	//Fitting Ellipse
-	void FitEllipse(InputArray _object, vector<float> &ellipse_M, vector<float> &ellipse_L);
+	void FitEllipse(InputArray _object, Point2i realSize, vector<float> &ellipse_M, vector<float> &ellipse_L);
 
 	bool DoAutomatedGrainSizing(Mat image, Point2i realSize, int mumax, vector<float> &ellipse_M, vector<float> &ellipse_L);
 };

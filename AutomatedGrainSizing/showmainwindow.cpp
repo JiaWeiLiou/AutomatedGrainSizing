@@ -5,7 +5,7 @@ ShowMainWindow::ShowMainWindow(QWidget *parent)
 {
 	QTime t;
 	t.start();
-	while (t.elapsed()<1000);
+	while (t.elapsed()<1500);
 	setWindowTitle("Automated Grain Sizing");
 	showWidget = new ShowWidget(this);
 	setCentralWidget(showWidget);
