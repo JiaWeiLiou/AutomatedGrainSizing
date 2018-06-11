@@ -68,8 +68,10 @@ ShowWidget::ShowWidget(QWidget *parent)
 	connect(widthLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setWidgetEnable()));
 	connect(warpCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setLineEditEnable(int)));
 	connect(this, SIGNAL(emitRealSize(QPointF)), imageWidget, SLOT(getRealSize(QPointF)));
+	connect(imageWidget, SIGNAL(emitRealSize(QPoint)), this, SLOT(getRealSize(QPoint)));
 	connect(warpCheckBox, SIGNAL(stateChanged(int)), imageWidget, SLOT(getCheckBoxState(int)));
 	connect(startPushButton, SIGNAL(clicked()), imageWidget, SLOT(startProcessing()));
+
 }
 
 void ShowWidget::setWidgetEnable()
@@ -114,4 +116,10 @@ void ShowWidget::setLineEditEnable(int checkBoxState)
 		heightLineEdit->setEnabled(false);
 		hUintLabel->setEnabled(false);
 	}
+}
+
+void ShowWidget::getRealSize(QPoint size)
+{
+	widthLineEdit->setText(QString::number(size.x()));
+	heightLineEdit->setText(QString::number(size.y()));
 }

@@ -14,21 +14,53 @@ void ShowImage::loadImage(QString filePathName)
 	clearPoints();					// clear image widget 's point
 	repaint();						// repaint image widget
 	this->filePathName = filePathName;
+	loadParameter(filePathName);
 	rawImage.load(filePathName);	// store image's
 	showImage = rawImage;
 	loading = false;				// show loading
 	initial();						// initial image widget
 }
 
+void ShowImage::loadParameter(QString filePathName)
+{
+	int pos1 = filePathName.lastIndexOf('.');
+	QString filePath = filePathName.left(pos1);			//file path
+	QFile file(filePath + ".param");
+	if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		QTextStream streamread(&file);
+		size_t i = 0;
+		while (!streamread.atEnd()) {
+			QString line = streamread.readLine();
+			int pos1 = line.indexOf('\t');
+			if (i < 4) {
+				float x = (line.left(pos1)).toFloat();
+				float y = (line.right(line.size() - pos1 - 1)).toFloat();
+				rawImage4Points << QPointF((line.left(pos1)).toFloat(), (line.right(line.size() - pos1 - 1)).toFloat());
+			} else if (i < 6) {
+				rawImage2Points << QPointF((line.left(pos1)).toFloat(), (line.right(line.size() - pos1 - 1)).toFloat());
+			} else if (i == 6) {
+				emit emitRealSize(QPoint((line.left(pos1)).toFloat(), (line.right(line.size() - pos1 - 1)).toFloat()));
+			}
+			++i;
+		}
+		file.close();
+
+		if (i < 6) {
+			rawImage4Points.clear();
+			rawImage2Points.clear();
+		} else {
+			image4PointsFull = 1;							// image 4 points full
+			image2PointsFull = 1;							// image 2 points full
+		}
+		emit pointModified();
+	}
+}
+
 void ShowImage::saveFile(QString filePathName)
 {
-	int pos1 = filePathName.lastIndexOf('/');
-	int pos2 = filePathName.lastIndexOf('.');
-	QString filePath = filePathName.left(pos1 + 1);									//file path
-	QString fileNameType = filePathName.right(filePathName.size() - pos1 - 1);		//file name and file type
-	QString fileName = fileNameType.left(pos2 - pos1 - 1);							//file name
-
-	QFile file(filePath + fileName + ".gsd");
+	int pos1 = filePathName.lastIndexOf('.');
+	QString filePath = filePathName.left(pos1);			//file path
+	QFile file(filePath + ".gsd");
 	if (file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
 		QTextStream out(&file);
 		out << dec << fixed;
@@ -42,14 +74,11 @@ void ShowImage::saveFile(QString filePathName)
 
 void ShowImage::saveParameter(QString filePathName)
 {
-	int pos1 = filePathName.lastIndexOf('/');
-	int pos2 = filePathName.lastIndexOf('.');
-	QString filePath = filePathName.left(pos1 + 1);									//file path
-	QString fileNameType = filePathName.right(filePathName.size() - pos1 - 1);		//file name and file type
-	QString fileName = fileNameType.left(pos2 - pos1 - 1);							//file name
-
 	warp2RawImagePoints();
-	QFile file(filePath + fileName + ".param");
+
+	int pos1 = filePathName.lastIndexOf('.');
+	QString filePath = filePathName.left(pos1);			//file path
+	QFile file(filePath + ".param");
 	if (file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
 		QTextStream out(&file);
 		out << dec << fixed;

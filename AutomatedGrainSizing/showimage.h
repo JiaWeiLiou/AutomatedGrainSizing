@@ -41,7 +41,8 @@ public:
 	AutomatedGrainSizing *progressBar;
 
 	void loadImage(QString filePathName);				// load image
-	void saveFile(QString filePathName);					// save GSD
+	void loadParameter(QString filePathName);				// load parameter
+	void saveFile(QString filePathName);				// save GSD
 	void saveParameter(QString filePathName);			// save parameter
 	int getMuMax();										// get mu max
 
@@ -95,6 +96,7 @@ private:
 
 signals:
 	void pointModified();								// points modified
+	void emitRealSize(QPoint);							// emit realSize
 
 private slots:
 	void getRealSize(QPointF size);						// get lineEdit size

@@ -175,6 +175,12 @@ void AutomatedGrainSizing::RGBToGray(InputArray _image, OutputArray _gray)
 				gray.at<uchar>(i, j) = ((double)image.at<Vec3b>(i, j)[0] + (double)image.at<Vec3b>(i, j)[1] + (double)image.at<Vec3b>(i, j)[2]) / 3;
 			}
 		}
+	} else if (image.channels() == 4) {
+		for (size_t i = 0; i < gray.rows; ++i) {
+			for (size_t j = 0; j < gray.cols; ++j) {
+				gray.at<uchar>(i, j) = ((double)image.at<Vec4b>(i, j)[0] + (double)image.at<Vec4b>(i, j)[1] + (double)image.at<Vec4b>(i, j)[2]) / 3;
+			}
+		}
 	} else {
 		image.copyTo(gray);
 	}
