@@ -30,7 +30,6 @@ void ShowMainWindow::dropEvent(QDropEvent *event)
 		return;
 	} else {
 		int pos1 = filePathName.lastIndexOf('/');
-		filePath = filePath.left(pos1 + 1);									//file path
 		fileName = filePathName.right(filePathName.size() - pos1 - 1);		//file name
 	}
 

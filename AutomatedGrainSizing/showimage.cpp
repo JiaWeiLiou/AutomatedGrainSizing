@@ -13,10 +13,57 @@ void ShowImage::loadImage(QString filePathName)
 	loading = true;					// show loading
 	clearPoints();					// clear image widget 's point
 	repaint();						// repaint image widget
+	this->filePathName = filePathName;
 	rawImage.load(filePathName);	// store image's
 	showImage = rawImage;
 	loading = false;				// show loading
 	initial();						// initial image widget
+}
+
+void ShowImage::saveFile(QString filePathName)
+{
+	int pos1 = filePathName.lastIndexOf('/');
+	int pos2 = filePathName.lastIndexOf('.');
+	QString filePath = filePathName.left(pos1 + 1);									//file path
+	QString fileNameType = filePathName.right(filePathName.size() - pos1 - 1);		//file name and file type
+	QString fileName = fileNameType.left(pos2 - pos1 - 1);							//file name
+
+	QFile file(filePath + fileName + ".gsd");
+	if (file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+		QTextStream out(&file);
+		out << dec << fixed;
+		for (int i = 0; i < ellipseM.size(); ++i) {
+			out << ellipseM[i] << "\t";
+		}
+		out << endl;
+		file.close();
+	}
+}
+
+void ShowImage::saveParameter(QString filePathName)
+{
+	int pos1 = filePathName.lastIndexOf('/');
+	int pos2 = filePathName.lastIndexOf('.');
+	QString filePath = filePathName.left(pos1 + 1);									//file path
+	QString fileNameType = filePathName.right(filePathName.size() - pos1 - 1);		//file name and file type
+	QString fileName = fileNameType.left(pos2 - pos1 - 1);							//file name
+
+	warp2RawImagePoints();
+	QFile file(filePath + fileName + ".param");
+	if (file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+		QTextStream out(&file);
+		out << dec << fixed;
+		for (int i = 0; i < rawImage4Points.size(); ++i) {
+			out << rawImage4Points[i].x() << "\t" << rawImage4Points[i].y() << "\n";
+		}
+		for (int i = 0; i < rawImage2Points.size(); ++i) {
+			out << rawImage2Points[i].x() << "\t" << rawImage2Points[i].y() << "\n";
+		}
+		out << realSize.x() << "\t" << realSize.y() << "\n";
+		out << getMuMax() << "\n";
+		out << endl;
+		file.close();
+	}
 }
 
 int ShowImage::getMuMax()
@@ -658,6 +705,8 @@ void ShowImage::startProcessing()
 		cv::Mat img = QImage2Mat(warpImage);
 		finish = progressBar->DoAutomatedGrainSizing(img, cv::Point2i(realSize.x(), realSize.y()), getMuMax(), ellipseM, ellipseL);
 		emit pointModified();
+		saveFile(filePathName);
+		saveParameter(filePathName);
 	}
 }
 

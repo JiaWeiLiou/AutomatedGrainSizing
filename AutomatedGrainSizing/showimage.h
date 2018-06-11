@@ -41,6 +41,8 @@ public:
 	AutomatedGrainSizing *progressBar;
 
 	void loadImage(QString filePathName);				// load image
+	void saveFile(QString filePathName);					// save GSD
+	void saveParameter(QString filePathName);			// save parameter
 	int getMuMax();										// get mu max
 
 	QVector<QPointF> rawImage4Points;					// record 4  raw image points' pixel
@@ -73,6 +75,7 @@ protected:
 	void paintEvent(QPaintEvent *event);				// drawing the result
 
 private:
+	QString filePathName;								// record file full path 
 	float maxScale = 0.0f;								// maximum scale
 	float minScale = 0.0f;								// minimun scale
 	float scale = 0.0f;									// scale to draw

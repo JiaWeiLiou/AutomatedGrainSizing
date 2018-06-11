@@ -15,7 +15,6 @@ public:
 
 protected:
 	QString filePathName;							// store image path and name
-	QString filePath;								// store image path
 	QString fileName;								// store image name
 	void createActions();
 	void createMenus();
