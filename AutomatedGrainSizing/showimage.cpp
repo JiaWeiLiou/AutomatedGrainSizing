@@ -8,17 +8,24 @@ ShowImage::ShowImage(QWidget *parent)
 	setMouseTracking(true);								// tracking mouse location
 }
 
-void ShowImage::loadImage(QString filePathName)
+bool ShowImage::loadImage(QString filePathName)
 {
 	loading = true;					// show loading
 	clearPoints();					// clear image widget 's point
 	repaint();						// repaint image widget
 	this->filePathName = filePathName;
-	loadParameter(filePathName);
-	rawImage.load(filePathName);	// store image's
-	showImage = rawImage;
-	loading = false;				// show loading
-	initial();						// initial image widget
+	bool success = rawImage.load(filePathName);	// store image's
+	if (success) {
+		loadParameter(filePathName);
+		showImage = rawImage;
+		loading = false;				// show loading
+		initial();						// initial image widget
+	} else {
+		showImage = QImage();
+		loading = false;				// show loading
+		initial();						// initial image widget
+	}
+	return success;
 }
 
 void ShowImage::loadParameter(QString filePathName)

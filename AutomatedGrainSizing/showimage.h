@@ -40,8 +40,8 @@ public:
 	ShowImage(QWidget *parent = Q_NULLPTR);
 	AutomatedGrainSizing *progressBar;
 
-	void loadImage(QString filePathName);				// load image
-	void loadParameter(QString filePathName);				// load parameter
+	bool loadImage(QString filePathName);				// load image
+	void loadParameter(QString filePathName);			// load parameter
 	void saveFile(QString filePathName);				// save GSD
 	void saveParameter(QString filePathName);			// save parameter
 	int getMuMax();										// get mu max
