@@ -55,6 +55,7 @@ public:
 	bool loading = false;								// loading file
 	bool image4PointModified = 1;						// record 4 points modified(0 - not mod, 1 - mod)
 	bool image2PointModified = 1;						// record 2 points modified(0 - not mod, 1 - mod)
+	bool realSizeModified = 1;							// record realSize modified
 	bool finish = 0;									// record AGS has been done or not
 	QImage showImage;									// image to show
 	QImage rawImage;									// store raw image

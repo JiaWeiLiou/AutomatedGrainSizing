@@ -6,6 +6,7 @@ ShowImage::ShowImage(QWidget *parent)
 	initial();
 	clearPoints();
 	setMouseTracking(true);								// tracking mouse location
+	QApplication::alert(this, 0);
 }
 
 bool ShowImage::loadImage(QString filePathName)
@@ -684,9 +685,10 @@ void ShowImage::warp2RawImagePoints()
 
 void ShowImage::perspectiveTransform()
 {
-	if (image4PointModified) {
+	if (image4PointModified || realSizeModified) {
 
 		image4PointModified = 0;
+		realSizeModified = 0;
 
 		QVector<QPointF> L;
 		L << QPointF(0, 0) << QPointF(imgW, 0) << QPointF(imgW, imgH) << QPointF(0, imgH);
@@ -749,6 +751,7 @@ void ShowImage::startProcessing()
 		emit pointModified();
 		saveFile(filePathName);
 		saveParameter(filePathName);
+		QApplication::alert(this, 0);
 	}
 }
 

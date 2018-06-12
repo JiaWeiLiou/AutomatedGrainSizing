@@ -3,9 +3,9 @@
 ShowMainWindow::ShowMainWindow(QWidget *parent)
 	: QMainWindow(parent)
 {
-	QTime t;
-	t.start();
-	while (t.elapsed()<1500);
+	QTime time;
+	time.start();
+	while (time.elapsed()<1500);
 	setWindowTitle("Automated Grain Sizing");
 	setWindowIcon(QPixmap(":/Resources/Icon.png"));
 	setWindowState(Qt::WindowMaximized);

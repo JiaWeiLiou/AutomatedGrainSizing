@@ -73,7 +73,6 @@ ShowWidget::ShowWidget(QWidget *parent)
 	connect(imageWidget, SIGNAL(emitRealSize(QPoint)), this, SLOT(getRealSize(QPoint)));
 	connect(warpCheckBox, SIGNAL(stateChanged(int)), imageWidget, SLOT(getCheckBoxState(int)));
 	connect(startPushButton, SIGNAL(clicked()), imageWidget, SLOT(startProcessing()));
-
 }
 
 void ShowWidget::setWidgetEnable()
@@ -129,6 +128,7 @@ void ShowWidget::getRealSize(QPoint size)
 void ShowWidget::setFinished()
 {
 	imageWidget->finish = 0;
+	imageWidget->realSizeModified = 1;
 	
 	int Wvalue = widthLineEdit->text().toInt();
 	int Hvalue = heightLineEdit->text().toInt();
