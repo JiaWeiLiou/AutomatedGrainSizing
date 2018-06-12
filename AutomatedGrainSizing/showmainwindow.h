@@ -52,4 +52,5 @@ protected slots:
 	void showOpenImage();
 	void showLoadParameter();
 	void showCloseImage();
+	void setLoadParameterAction(int state);
 };

@@ -63,6 +63,7 @@ void ShowMainWindow::createActions()
 	loadParameterAction->setEnabled(false);
 	loadParameterAction->setShortcut(tr("Ctrl+L"));
 	connect(loadParameterAction, SIGNAL(triggered()), this, SLOT(showLoadParameter()));
+	connect(showWidget->warpCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setLoadParameterAction(int)));
 
 	// Close Image
 	closeImageAction = new QAction("&Close Image(C)", this);
@@ -137,12 +138,18 @@ void ShowMainWindow::showLoadParameter()
 
 void ShowMainWindow::showCloseImage()
 {
+	showWidget->warpCheckBox->setCheckState(Qt::Unchecked);		// set unclick
+	showWidget->imageWidget->closeImage();
 	loadParameterAction->setEnabled(false);
 	closeImageAction->setEnabled(false);
-	showWidget->warpCheckBox->setCheckState(Qt::Unchecked);		// set unclick
-	showWidget->imageWidget->clearPoints();
-	repaint();						// repaint image widget
-	showWidget->imageWidget->showImage = QImage();
-	showWidget->imageWidget->loading = false;					// show loading
-	showWidget->imageWidget->initial();							// initial image widget
+	repaint();													// repaint image widget
+}
+
+void ShowMainWindow::setLoadParameterAction(int state)
+{
+	if (state == Qt::Unchecked) {
+		loadParameterAction->setEnabled(true);
+	} else {
+		loadParameterAction->setEnabled(false);
+	}
 }

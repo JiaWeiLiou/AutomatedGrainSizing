@@ -27,17 +27,18 @@ public:
 	QLineEdit		*heightLineEdit;
 	QLabel			*hUintLabel;
 	QPushButton		*startPushButton;
-	QPointF realSize;
 	int mumax;
 	vector<float> ellipseM;
 	vector<float> ellipseL;
 
 signals:
-	void emitRealSize(QPointF);
+	void emitRealSize(QPoint);
 
 private slots:
-	void setWidgetEnable();
+	void setCheckBoxEnable(int num);
+	void setPushButtonEnable(int num);
+	void setWidgetEnable(QString num);
 	void setLineEditEnable(int checkBoxState);
 	void getRealSize(QPoint size);						// get lineEdit size
-	void setFinished();
+	void setPushButton(bool success);
 };

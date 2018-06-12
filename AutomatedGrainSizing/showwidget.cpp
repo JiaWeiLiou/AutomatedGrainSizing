@@ -11,10 +11,17 @@ ShowWidget::ShowWidget(QWidget *parent)
 	imageWidget->setFocusPolicy(Qt::ClickFocus);
 	imageWidget->setMinimumSize(600, 400);
 	imageWidget->setStyleSheet("border: 1px solid lightgray;");
+	connect(imageWidget, SIGNAL(image4PointsModified(int)), this, SLOT(setCheckBoxEnable(int)));
+	connect(imageWidget, SIGNAL(image2PointsModified(int)), this, SLOT(setPushButtonEnable(int)));
+	connect(this, SIGNAL(emitRealSize(QPoint)), imageWidget, SLOT(getRealSize(QPoint)));
+	connect(imageWidget, SIGNAL(emitRealSize(QPoint)), this, SLOT(getRealSize(QPoint)));
+	connect(imageWidget, SIGNAL(processingFinish(bool)), this, SLOT(setPushButton(bool)));
 
 	// set warpCheckBox
 	warpCheckBox = new QCheckBox("Perspective Projection Transform");
 	warpCheckBox->setEnabled(false);
+	connect(warpCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setLineEditEnable(int)));
+	connect(warpCheckBox, SIGNAL(stateChanged(int)), imageWidget, SLOT(getCheckBoxState(int)));
 
 	// set RegExp
 	QRegExp rx("^[0-9]*[1-9][0-9]*$");
@@ -27,6 +34,7 @@ ShowWidget::ShowWidget(QWidget *parent)
 	widthLineEdit->setFixedWidth(50);
 	widthLineEdit->setAlignment(Qt::AlignRight);
 	wUintLabel = new QLabel("(mm)");
+	connect(widthLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setWidgetEnable(QString)));
 
 	// set heightLabel and heightLineEdit and hUintLabel
 	heightLabel = new QLabel("Height");
@@ -35,24 +43,27 @@ ShowWidget::ShowWidget(QWidget *parent)
 	heightLineEdit->setFixedWidth(50);
 	heightLineEdit->setAlignment(Qt::AlignRight);
 	hUintLabel = new QLabel("(mm)");
+	connect(heightLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setWidgetEnable(QString)));
+	emit emitRealSize(QPoint(widthLineEdit->text().toInt(), heightLineEdit->text().toInt()));
 
 	// set startPuchButton
 	startPushButton = new QPushButton("Start");
 	startPushButton->setMinimumWidth(100);
 	startPushButton->setEnabled(false);
+	connect(startPushButton, SIGNAL(clicked()), imageWidget, SLOT(startProcessing()));
 
 	// set hLayout
 	QHBoxLayout *hLayout = new QHBoxLayout;
 	hLayout->addWidget(warpCheckBox);
 	hLayout->addSpacing(20);
 	hLayout->addStretch(5);
-	hLayout->addWidget(heightLabel);
-	hLayout->addWidget(heightLineEdit);
-	hLayout->addWidget(hUintLabel);
-	hLayout->addSpacing(10);
 	hLayout->addWidget(widthLabel);
 	hLayout->addWidget(widthLineEdit);
 	hLayout->addWidget(wUintLabel);
+	hLayout->addSpacing(10);
+	hLayout->addWidget(heightLabel);
+	hLayout->addWidget(heightLineEdit);
+	hLayout->addWidget(hUintLabel);
 	hLayout->addSpacing(20);
 	hLayout->addStretch(1);
 	hLayout->addWidget(startPushButton);
@@ -61,42 +72,42 @@ ShowWidget::ShowWidget(QWidget *parent)
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
 	mainLayout->addWidget(imageWidget);
 	mainLayout->addLayout(hLayout);
-
-	//set signal and slot connect
-	connect(imageWidget, SIGNAL(pointModified()), this, SLOT(setWidgetEnable()));
-	connect(heightLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setWidgetEnable()));
-	connect(widthLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setWidgetEnable()));
-	connect(heightLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setFinished()));
-	connect(widthLineEdit, SIGNAL(textChanged(QString)), this, SLOT(setFinished()));
-	connect(warpCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setLineEditEnable(int)));
-	connect(this, SIGNAL(emitRealSize(QPointF)), imageWidget, SLOT(getRealSize(QPointF)));
-	connect(imageWidget, SIGNAL(emitRealSize(QPoint)), this, SLOT(getRealSize(QPoint)));
-	connect(warpCheckBox, SIGNAL(stateChanged(int)), imageWidget, SLOT(getCheckBoxState(int)));
-	connect(startPushButton, SIGNAL(clicked()), imageWidget, SLOT(startProcessing()));
 }
 
-void ShowWidget::setWidgetEnable()
+void ShowWidget::setCheckBoxEnable(int num)
 {
-	int Wvalue = widthLineEdit->text().toInt();
-	int Hvalue = heightLineEdit->text().toInt();
-	if (imageWidget->rawImage4Points.size() == 4 && Wvalue > 0 && Hvalue > 0) {
-		warpCheckBox->setEnabled(true);
-		realSize = QPointF(Wvalue, Hvalue);
-		emit emitRealSize(QPointF(Wvalue, Hvalue));
-	} else {
+	if (num < 4) {
 		warpCheckBox->setEnabled(false);
-	}
-
-	if (imageWidget->image2PointsFull && Wvalue > 0 && Hvalue > 0 && (!imageWidget->finish || imageWidget->image4PointModified || imageWidget->image2PointModified)) {
-		startPushButton->setText("Start");
-		startPushButton->setEnabled(true);
-	} else {
-		if (imageWidget->finish && !imageWidget->image4PointModified && !imageWidget->image2PointModified) {
-			startPushButton->setText("Finished");
-		} else {
-			startPushButton->setText("Start");
-		}
 		startPushButton->setEnabled(false);
+		startPushButton->setText("Start");
+	} else {
+		warpCheckBox->setEnabled(true);
+		startPushButton->setText("Start");
+	}
+}
+
+void ShowWidget::setPushButtonEnable(int num)
+{
+	if (num < 2) {
+		startPushButton->setEnabled(false);
+		startPushButton->setText("Start");
+	} else {
+		startPushButton->setEnabled(true);
+		startPushButton->setText("Start");
+	}
+}
+
+void ShowWidget::setWidgetEnable(QString num)
+{
+	if (num.toInt() <= 0) {
+		warpCheckBox->setEnabled(false);
+		startPushButton->setEnabled(false);
+		startPushButton->setText("Start");
+	} else {
+		warpCheckBox->setEnabled(true);
+		startPushButton->setEnabled(true);
+		startPushButton->setText("Start");
+		emit emitRealSize(QPoint(widthLineEdit->text().toInt(), heightLineEdit->text().toInt()));
 	}
 }
 
@@ -125,18 +136,13 @@ void ShowWidget::getRealSize(QPoint size)
 	heightLineEdit->setText(QString::number(size.y()));
 }
 
-void ShowWidget::setFinished()
+void ShowWidget::setPushButton(bool success)
 {
-	imageWidget->finish = 0;
-	imageWidget->realSizeModified = 1;
-	
-	int Wvalue = widthLineEdit->text().toInt();
-	int Hvalue = heightLineEdit->text().toInt();
-	if (imageWidget->image2PointsFull && Wvalue > 0 && Hvalue > 0) {
-		startPushButton->setText("Start");
-		startPushButton->setEnabled(true);
+	if (success) {
+		startPushButton->setText("Finished");
+		startPushButton->setEnabled(false);
 	} else {
 		startPushButton->setText("Start");
-		startPushButton->setEnabled(false);
+		startPushButton->setEnabled(true);
 	}
 }
