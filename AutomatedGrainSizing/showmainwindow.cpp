@@ -7,6 +7,13 @@ ShowMainWindow::ShowMainWindow(QWidget *parent)
 	t.start();
 	while (t.elapsed()<1500);
 	setWindowTitle("Automated Grain Sizing");
+	QString dir = QApplication::applicationDirPath();
+	QDir::setCurrent(dir);
+	QApplication::addLibraryPath("./AutomatedGrainSizing");
+	QIcon Icon("./AutomatedGrainSizing/Resources/Icon.ico");
+	bool judge = Icon.isNull();
+	this->setWindowIcon(Icon);
+	setWindowState(Qt::WindowMaximized);
 	showWidget = new ShowWidget(this);
 	setCentralWidget(showWidget);
 	setAcceptDrops(true);								// set main window can be drop

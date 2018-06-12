@@ -1,4 +1,6 @@
 <RCC>
-    <qresource prefix="AutomaticGrainSizing">
+    <qresource prefix="/AutomatedGrainSizing">
+        <file>Resources/SplashScreen.png</file>
+        <file>Resources/Icon.ico</file>
     </qresource>
 </RCC>
