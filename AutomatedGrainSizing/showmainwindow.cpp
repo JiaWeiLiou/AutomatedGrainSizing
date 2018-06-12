@@ -7,12 +7,7 @@ ShowMainWindow::ShowMainWindow(QWidget *parent)
 	t.start();
 	while (t.elapsed()<1500);
 	setWindowTitle("Automated Grain Sizing");
-	QString dir = QApplication::applicationDirPath();
-	QDir::setCurrent(dir);
-	QApplication::addLibraryPath("./AutomatedGrainSizing");
-	QIcon Icon("./AutomatedGrainSizing/Resources/Icon.ico");
-	bool judge = Icon.isNull();
-	this->setWindowIcon(Icon);
+	setWindowIcon(QPixmap(":/Resources/Icon.png"));
 	setWindowState(Qt::WindowMaximized);
 	showWidget = new ShowWidget(this);
 	setCentralWidget(showWidget);
@@ -112,7 +107,7 @@ void ShowMainWindow::createMenus()
 void ShowMainWindow::showOpenImage()
 {
 	QString _path = QProcessEnvironment::systemEnvironment().value("USERPROFILE") + "\\Desktop";
-	filePathName = QFileDialog::getOpenFileName(this, "Open Image", _path, "JPEG (*.JPG;*.JPEG;*.JPE);;PNG (*.PNG;*.PNS);;BMP (*.BMP;*.RLE;*.DIB);;TIFF (*.TIF;*.TIFF);;All Files (*.*)");
+	filePathName = QFileDialog::getOpenFileName(this, "Open Image", _path, "All Files (*.*);;JPEG (*.JPG;*.JPEG;*.JPE);;PNG (*.PNG;*.PNS);;BMP (*.BMP;*.RLE;*.DIB);;TIFF (*.TIF;*.TIFF)");
 	if (filePathName.isEmpty()) {
 		return;
 	}

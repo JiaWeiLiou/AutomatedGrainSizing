@@ -7,6 +7,7 @@
 #include <limits>
 #include <QtWidgets/QDialog>
 #include <QProgressDialog>
+#include <QIcon>
 
 using namespace std;
 using namespace cv;

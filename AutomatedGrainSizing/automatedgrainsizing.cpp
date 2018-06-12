@@ -3,11 +3,12 @@
 AutomatedGrainSizing::AutomatedGrainSizing(QWidget *parent)
 	: QDialog(parent)
 {
-	progressDialog = new QProgressDialog(this, Qt::WindowSystemMenuHint | Qt::WindowTitleHint);
+	progressDialog = new QProgressDialog(this, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::MSWindowsFixedSizeDialogHint);
 	progressDialog->setWindowModality(Qt::ApplicationModal);
 	progressDialog->setMinimumDuration(0);
 	progressDialog->setAttribute(Qt::WA_DeleteOnClose, true);
 	progressDialog->setWindowTitle("Please Wait");
+	progressDialog->setWindowIcon(QIcon(":/Resources/Icon.png"));
 	progressDialog->setLabelText("Running...");
 	progressDialog->setCancelButtonText("Cancel");
 }
