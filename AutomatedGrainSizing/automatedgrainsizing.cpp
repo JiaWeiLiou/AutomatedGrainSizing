@@ -977,11 +977,12 @@ void AutomatedGrainSizing::FitEllipse(InputArray _object, Point2i realSize, vect
 		}
 	}
 
+	float ratio = (float)(realSize.x) / (float)(object.cols);
 	for (size_t i = 0; i < objectNum; ++i) {
 		if (pointset[i].size() > 5) {
 			RotatedRect ellipse_obj = fitEllipse(pointset[i]);
-			float w = ellipse_obj.size.width * (float)(realSize.x) / (float)(object.cols);
-			float h = ellipse_obj.size.height * (float)(realSize.y) / (float)(object.rows);
+			float w = ellipse_obj.size.width * ratio;
+			float h = ellipse_obj.size.height * ratio;
 			if (w < h) {
 				ellipse_M.push_back(w);
 				ellipse_L.push_back(h);

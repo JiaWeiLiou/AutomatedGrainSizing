@@ -32,6 +32,9 @@ void ShowImage::loadParameter(QString filePathName)
 {
 	rawImage4Points.clear();
 	rawImage2Points.clear();
+	warpImage4Points.clear();
+	warpImage2Points.clear();
+	finish = 0;
 
 	int pos1 = filePathName.lastIndexOf('.');
 	QString filePath = filePathName.left(pos1);			//file path
