@@ -837,9 +837,7 @@ void ShowImage::startProcessing()
 {
 	if (!finished || image4PointModified || image2PointModified) {
 		progressBar = new AutomatedGrainSizing;
-		if (checkBoxState == Qt::Unchecked) {
-			raw2WarpImagePoints();
-		} else {
+		if (checkBoxState != Qt::Unchecked) {
 			warp2RawImagePoints();
 		}
 		perspectiveTransform();
