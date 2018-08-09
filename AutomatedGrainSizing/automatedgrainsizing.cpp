@@ -1109,8 +1109,7 @@ bool AutomatedGrainSizing::DoAutomatedGrainSizing(Mat image, Point2i realSize, i
 
 	Mat objectDE;
 	DeleteEdge(objectWT, objectDE);
-	imwrite("C:\\Users\\Jimmy\\Desktop\\bw.png", objectWT);
-
+	
 	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
