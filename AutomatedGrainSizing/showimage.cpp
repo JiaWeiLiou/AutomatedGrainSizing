@@ -74,15 +74,25 @@ void ShowImage::loadParameter(QString filePathName)
 void ShowImage::saveFile(QString filePathName)
 {
 	int pos1 = filePathName.lastIndexOf('.');
-	QFile file(filePathName.left(pos1) + ".gsd");
-	if (file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
-		QTextStream out(&file);
+	QFile Mfile(filePathName.left(pos1) + ".Mgsd");
+	QFile Lfile(filePathName.left(pos1) + ".Lgsd");
+	if (Mfile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+		QTextStream out(&Mfile);
 		out << dec << fixed;
 		for (int i = 0; i < ellipseM.size(); ++i) {
 			out << ellipseM[i] << "\t";
 		}
 		out << endl;
-		file.close();
+		Mfile.close();
+	}
+	if (Lfile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+		QTextStream out(&Lfile);
+		out << dec << fixed;
+		for (int i = 0; i < ellipseL.size(); ++i) {
+			out << ellipseL[i] << "\t";
+		}
+		out << endl;
+		Lfile.close();
 	}
 }
 
@@ -791,6 +801,14 @@ void ShowImage::perspectiveTransform()
 		cv::Mat warpImg;
 		cv::warpPerspective(rawImg, warpImg, perspectiveMatrix, cv::Size(W, H), cv::INTER_CUBIC);
 		warpImage = ShowImage::Mat2QImage(warpImg);
+
+	} else if (image2PointModified) {
+		
+		image2PointModified = 0;
+
+		// set warpImage2Points
+		raw2WarpImagePoints();
+
 	}
 }
 
