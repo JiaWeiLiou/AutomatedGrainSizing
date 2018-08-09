@@ -77,21 +77,21 @@ void ShowImage::saveFile(QString filePathName)
 	QFile Mfile(filePathName.left(pos1) + ".Mgsd");
 	QFile Lfile(filePathName.left(pos1) + ".Lgsd");
 	if (Mfile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
-		QTextStream out(&Mfile);
-		out << dec << fixed;
+		QTextStream Mout(&Mfile);
+		Mout << dec << fixed;
 		for (int i = 0; i < ellipseM.size(); ++i) {
-			out << ellipseM[i] << "\t";
+			Mout << ellipseM[i] << "\t";
 		}
-		out << endl;
+		Mout << endl;
 		Mfile.close();
 	}
 	if (Lfile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
-		QTextStream out(&Lfile);
-		out << dec << fixed;
+		QTextStream Lout(&Lfile);
+		Lout << dec << fixed;
 		for (int i = 0; i < ellipseL.size(); ++i) {
-			out << ellipseL[i] << "\t";
+			Lout << ellipseL[i] << "\t";
 		}
-		out << endl;
+		Lout << endl;
 		Lfile.close();
 	}
 }

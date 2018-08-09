@@ -1011,7 +1011,7 @@ bool AutomatedGrainSizing::DoAutomatedGrainSizing(Mat image, Point2i realSize, i
 	float mIdeal = (12 * sigma*sigma - n*wl*wl - 4 * n*wl - 3 * n) / (-4 * wl - 4);
 	int m = round(mIdeal);
 
-	progressDialog->setRange(0, 18 + (n + m));
+	progressDialog->setRange(0, 17 + (n + m));
 
 	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
@@ -1077,14 +1077,14 @@ bool AutomatedGrainSizing::DoAutomatedGrainSizing(Mat image, Point2i realSize, i
 	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
-	Mat objectCN;
-	ClearNoise(objectOpen, objectCN, mumax);
+	//Mat objectCN;
+	//ClearNoise(objectOpen, objectCN, mumax);
 
-	if (progressDialog->wasCanceled()) return false;
-	progressDialog->setValue(++num);
+	//if (progressDialog->wasCanceled()) return false;
+	//progressDialog->setValue(++num);
 
 	Mat objectDT;
-	cv::distanceTransform(objectCN, objectDT, CV_DIST_L2, 3);
+	cv::distanceTransform(objectOpen, objectDT, CV_DIST_L2, 3);
 
 	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
@@ -1096,19 +1096,20 @@ bool AutomatedGrainSizing::DoAutomatedGrainSizing(Mat image, Point2i realSize, i
 	progressDialog->setValue(++num);
 
 	Mat objectAS;
-	AddSeed(objectCN, objectEM, objectAS);
+	AddSeed(objectOpen, objectEM, objectAS);
 
 	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
 	Mat objectWT;
-	WatershedTransform(objectCN, objectAS, objectDT, objectWT);
+	WatershedTransform(objectOpen, objectAS, objectDT, objectWT);
 
 	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
 	Mat objectDE;
 	DeleteEdge(objectWT, objectDE);
+	imwrite("C:\\Users\\Jimmy\\Desktop\\bw.png", objectWT);
 
 	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
