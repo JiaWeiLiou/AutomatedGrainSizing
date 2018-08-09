@@ -1113,8 +1113,8 @@ bool AutomatedGrainSizing::DoAutomatedGrainSizing(Mat image, Point2i realSize, i
 	if (progressDialog->wasCanceled()) return false;
 	progressDialog->setValue(++num);
 
-	ellipse_M.clear();
-	ellipse_L.clear();
+	ellipse_M.clear();	// clear M
+	ellipse_L.clear();	// clear L
 	FitEllipse(objectDE, realSize, ellipse_M, ellipse_L);
 
 	progressDialog->setValue(++num);
