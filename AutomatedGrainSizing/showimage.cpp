@@ -756,16 +756,17 @@ void ShowImage::perspectiveTransform()
 
 		cv::Point2f bPt[4];
 		for (size_t i = 0; i < 4; ++i) {
-			float min = qPow(imgW, 2) + qPow(imgH, 2);
-			int minindex = 0;
-			for (size_t j = 0; j < 4; ++j) {
-				float imin = qPow(rawImage4Points[j].x() - L[i].x(), 2) + qPow(rawImage4Points[j].y() - L[i].y(), 2);
-				if (imin < min) {
-					min = imin;
-					minindex = j;
-				}
-			}
-			bPt[i] = cv::Point2f(rawImage4Points[minindex].x(), rawImage4Points[minindex].y());
+			//float min = qPow(imgW, 2) + qPow(imgH, 2);
+			//int minindex = 0;
+			//for (size_t j = 0; j < 4; ++j) {
+			//	float imin = qPow(rawImage4Points[j].x() - L[i].x(), 2) + qPow(rawImage4Points[j].y() - L[i].y(), 2);
+			//	if (imin < min) {
+			//		min = imin;
+			//		minindex = j;
+			//	}
+			//}
+			//bPt[i] = cv::Point2f(rawImage4Points[minindex].x(), rawImage4Points[minindex].y());
+			bPt[i] = cv::Point2f(rawImage4Points[i].x(), rawImage4Points[i].y());
 		}
 
 		/* set warp image size */

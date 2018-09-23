@@ -374,7 +374,7 @@ void AutomatedGrainSizing::KittlerThresholdArea(InputArray _gray, OutputArray _b
 	}
 
 	char th = 0;
-	for (size_t i = 50; i < 255; ++i) {
+	for (size_t i = 20; i < 255; ++i) {
 		if (J[i] <= J[i + 1] && J[i] <= J[i - 1] && J[i + 1] != DBL_MAX && J[i - 1] != DBL_MAX) {
 			th = i;
 			break;
@@ -549,7 +549,8 @@ void AutomatedGrainSizing::ClearNoise(InputArray _binary, OutputArray _clear, fl
 		maxSize = labeltable[i] > maxSize ? labeltable[i] : maxSize;
 	}
 
-	int tolSize = round(mumax * mumax / 100);
+	/*int tolSize = round(mumax * mumax / 100);*/
+	int tolSize = 25;
 
 	for (size_t i = 0; i < labelImg.rows; ++i) {
 		for (size_t j = 0; j < labelImg.cols; ++j) {
